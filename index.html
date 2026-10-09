@@ -186,6 +186,14 @@
   .verdict.bad { background: #F4DCD3; color: #8A2E1C; }
   .verdict b { font-weight: 900; }
 
+  .wi { margin-top: 26px; padding: 20px 20px 18px; border: 1.5px dashed var(--beige-gold); border-radius: 16px; background: var(--white); }
+  .wi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .wi-title { font-size: 17px; font-weight: 900; letter-spacing: -0.4px; }
+  .wi-ref { font-size: 11.5px; font-weight: 800; color: var(--brown); background: var(--bg-alt); padding: 3px 10px; border-radius: 999px; }
+  .wi-desc { font-size: 13.5px; color: var(--ink-mute); font-weight: 600; margin: 6px 0 14px; line-height: 1.6; }
+  .wi-bar { position: relative; height: 14px; border-radius: 7px; background: linear-gradient(90deg, #F4DCD3 0 20%, #F6E9CF 20% 40%, #E8E4D0 40% 80%, #E3EDE2 80% 100%); margin: 18px 0 30px; }
+  .wi-bar .pin { position: absolute; top: -6px; width: 4px; height: 26px; margin-left: -2px; background: var(--dark-warm); border-radius: 2px; }
+  .wi-bar .tick { position: absolute; top: 18px; transform: translateX(-50%); font-size: 11px; font-weight: 800; color: var(--ink-mute); white-space: nowrap; }
   .note { font-size: 13px; color: var(--ink-mute); font-weight: 600; margin-top: 12px; line-height: 1.6; }
   .note b { color: var(--ink-soft); }
 
@@ -353,6 +361,18 @@
       </details>
 
       <div class="result" id="r1"></div>
+
+      <div class="wi" id="wiBox">
+        <div class="wi-head"><span class="wi-title">부자지수로 보는 내 출발점</span><span class="wi-ref">참고용</span></div>
+        <p class="wi-desc">내 나이·소득이면 이 정도는 모았어야 한다는 기준과 비교합니다. 100%가 기준선입니다.</p>
+        <div class="grid-2">
+          <div class="field"><label class="label" for="wiInc">세전 연소득</label><div class="input-wrap"><input type="text" inputmode="numeric" id="wiInc" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="wiInc"></div><div class="input-hint">이미 은퇴했다면 은퇴 직전 1년 소득을 넣어 주세요.</div></div>
+          <div class="field"><label class="label" for="wiAge">현재 나이</label><div class="input-wrap"><input type="number" id="wiAge" min="20" max="100" placeholder="자동"><span class="unit">세</span></div><div class="input-hint">비워두면 2단계 출생연도로 계산합니다.</div></div>
+          <div class="field"><label class="label" for="wiEtc">부동산 등 그 밖의 자산 (시세)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="wiEtc" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="wiEtc"></div><div class="input-hint">집·상가·전세보증금·자동차 등. 위에 넣은 금융자산은 자동으로 더합니다.</div></div>
+          <div class="field"><label class="label" for="wiDebt">부채 합계</label><div class="input-wrap"><input type="text" inputmode="numeric" id="wiDebt" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="wiDebt"></div><div class="input-hint">주택담보대출·신용대출·받은 전세보증금 등</div></div>
+        </div>
+        <div id="rWi"></div>
+      </div>
       <details class="more"><summary>자세히 알아보기 · 숫자는 어디서 확인하나요?</summary><div class="more-body">
 <h4>퇴직금</h4>
 <ul><li><b>DB형</b>은 퇴직할 때 받을 금액이 정해져 있습니다. 회사 인사팀이나 퇴직연금 사업자 앱에서 '예상 퇴직급여'를 확인하세요.</li>
@@ -362,6 +382,11 @@
 <ul><li>연금저축·IRP에 연말정산 한도(합산 연 900만원)보다 많이 넣은 돈, 연말정산 때 공제를 신청하지 않은 돈이 여기에 해당합니다.</li>
 <li>이 돈은 꺼낼 때 <b>세금이 없습니다.</b> 다만 금융회사에 '과세제외금액'으로 등록돼 있어야 하니, 연금 개시 전에 꼭 확인하세요.</li>
 <li>모르면 비워 두세요. 전부 세액공제를 받은 것으로 보고 보수적으로 계산합니다.</li></ul>
+<h4>부자지수는 어떻게 계산하나요?</h4>
+<ul><li>토마스 스탠리·윌리엄 댄코의 책 『이웃집 백만장자』에 나온 공식입니다. <b>부자지수 = 순자산 × 10 ÷ (나이 × 세전 연소득)</b></li>
+<li>예를 들어 55세, 연소득 7,000만원이면 기준 순자산은 55 × 7,000 ÷ 10 = 3억 8,500만원입니다. 순자산이 이만큼이면 100%입니다.</li>
+<li>책에서는 기준의 2배 이상을 '자산을 잘 쌓는 사람', 절반 이하를 '소득에 비해 자산이 덜 쌓인 사람'으로 나눴습니다.</li>
+<li>미국 고소득 가구를 조사해 만든 기준이라 그대로 맞지는 않습니다. 30대 이하이거나 최근 소득이 크게 늘었다면 기준이 실제보다 높게 잡히고, 은퇴 후 줄어든 소득을 넣으면 지수가 실제보다 높게 나옵니다. 방향을 보는 참고용으로만 쓰세요.</li></ul>
 <h4>국민연금·재산</h4>
 <ul><li>국민연금 예상 월액은 '내 곁에 국민연금' 앱이나 국민연금공단 홈페이지에서 1분이면 조회됩니다. 지금까지 낸 기록과 앞으로 계속 낸다는 가정이 들어간 금액입니다.</li>
 <li>재산세 과세표준은 재산세 고지서나 위택스에서 확인합니다. 공시가격이 아니라 그보다 훨씬 작은 '과세표준'을 넣어야 6단계 판정이 맞습니다.</li></ul>
@@ -713,6 +738,14 @@ function model() {
     } catch (err) { m.engine = null; }
   }
 
+  /* 부자지수 (참고용): 순자산 × 10 ÷ (나이 × 세전 연소득) */
+  m.wiInc = num('wiInc'); m.wiEtc = num('wiEtc'); m.wiDebt = num('wiDebt');
+  m.wiAgeAuto = !has('wiAge');
+  m.wiAge = has('wiAge') ? clamp(num('wiAge'), 20, 100) : new Date().getFullYear() - m.birth;
+  m.wiNet = m.total + m.wiEtc - m.wiDebt;
+  m.wiBase = m.wiAge * m.wiInc / 10;
+  m.wiIdx = m.wiBase > 0 ? m.wiNet / m.wiBase * 100 : null;
+
   m.isaMove = has('isaMove') ? num('isaMove') : Math.min(m.isa, 3000);
   m.creditRate = S.v.creditRate ? parseFloat(S.v.creditRate) : 16.5;
   m.isaBase = Math.min(m.isaMove * 0.1, 300);
@@ -759,6 +792,26 @@ function render1(m) {
       ${stat('국민연금 예상', m.nps ? '월 ' + fmtMan(m.nps) : '미입력', '정상 수령 기준')}
     </div>
     <p class="note">연금계좌 돈은 55세부터 연금으로 꺼낼 수 있고, 꺼내는 순서와 금액에 따라 세금이 달라집니다. 그 이야기는 4단계에서 합니다.</p>`;
+}
+
+function renderWi(m) {
+  if (m.wiIdx === null) { $('rWi').innerHTML = `<p class="note">세전 연소득을 넣으면 부자지수가 계산됩니다.</p>`; return; }
+  const v = m.wiIdx;
+  const [cls, name, msg] = v >= 200 ? ['ok', '자산 축적 우수', '같은 나이·소득 기준의 2배 이상을 모았습니다. 이제는 모은 돈을 오래, 세금 덜 내고 꺼내 쓰는 설계가 중요합니다.']
+    : v >= 100 ? ['ok', '기준 이상', '나이·소득에 비해 자산을 잘 쌓아 왔습니다. 남은 기간 동안 이 흐름을 지키는 게 핵심입니다.']
+    : v >= 50 ? ['warn', '기준 미달', '소득에 비해 자산이 덜 쌓였습니다. 은퇴 전 남은 기간의 저축률과 지출 점검이 필요합니다.']
+    : ['bad', '축적 부진', '소득에 비해 모인 자산이 기준의 절반에 못 미칩니다. 지출 구조와 부채부터 다시 보세요.'];
+  const pos = x => clamp(x / 250 * 100, 0, 100);
+  const gap = m.wiNet - m.wiBase;
+  $('rWi').innerHTML = `
+    <div class="stat-grid" style="margin-top:18px">
+      ${stat('부자지수', m.wiNet <= 0 ? '0% 이하' : pct(v), name, true)}
+      ${stat('내 순자산', fmtMan(m.wiNet), `금융 ${fmtMan(m.total)} + 기타 ${fmtMan(m.wiEtc)} − 부채 ${fmtMan(m.wiDebt)}`)}
+      ${stat('기준 순자산 (100%)', fmtMan(m.wiBase), `${m.wiAge}세 × ${fmtMan(m.wiInc)} ÷ 10`)}
+    </div>
+    <div class="wi-bar"><div class="pin" style="left:${pos(Math.max(0, v))}%"></div>${[[50, '50%'], [100, '100% 기준'], [200, '200%']].map(([x, t]) => `<span class="tick" style="left:${pos(x)}%">${t}</span>`).join('')}</div>
+    <div class="verdict ${cls}"><b>${name}</b> · 기준보다 ${gap >= 0 ? fmtMan(gap) + ' 많습니다' : fmtMan(-gap) + ' 적습니다'}. ${msg}</div>
+    <p class="note">${m.wiAgeAuto ? `나이는 ${m.birth}년생 기준 ${m.wiAge}세로 계산했습니다. ` : ''}『이웃집 백만장자』(토마스 스탠리) 공식 기준이며, 미국 고소득 가구 조사로 만든 지표라 참고로만 보세요.</p>`;
 }
 
 function render2(m) {
@@ -1082,14 +1135,14 @@ function showTab(id, scroll) {
 
 function renderAll() {
   const m = model();
-  render1(m); render2(m); render3(m); render4(m); render5(m); render6(m); renderSummary(m);
+  render1(m); renderWi(m); render2(m); render3(m); render4(m); render5(m); render6(m); renderSummary(m);
   document.querySelectorAll('.chip-read[data-for]').forEach(el => { const id = el.dataset.for; el.textContent = has(id) && num(id) >= 10000 ? fmtMan(num(id)) : ''; });
   renderTabs();
   $('exampleNote').style.display = S.example ? '' : 'none';
 }
 
 /* ===== 이벤트 ===== */
-const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'biz', 'rr', 'inf', 'endAge', 'save'];
+const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'biz', 'rr', 'inf', 'endAge', 'save'];
 function restore() {
   FIELDS.forEach(id => { const el = $(id); if (!el || !(id in S.v)) return; if (el.type === 'checkbox') el.checked = !!S.v[id]; else el.value = S.v[id]; });
 }
@@ -1099,7 +1152,7 @@ function capture(id) { const el = $(id); S.v[id] = el.type === 'checkbox' ? el.c
 function exampleValues() {
   const d = new Date(); d.setFullYear(d.getFullYear() + 1);
   const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return { retire: '20,000', ps: '13,000', irp: '5,000', isa: '4,000', gen: '6,000', nps: '150', noded: '3,000', prop: '30,000',
+  return { retire: '20,000', ps: '13,000', irp: '5,000', isa: '4,000', gen: '6,000', nps: '150', noded: '3,000', prop: '30,000', wiInc: '7,000', wiEtc: '60,000', wiDebt: '5,000',
     birth: '1971', retireAge: '60', living: '298', shift: '0', wAge: '60', retYears: '25', isaDate: iso, fin: '600', spNps: '50', rr: '4', inf: '2.5', endAge: '95', save: '50' };
 }
 function clearFields() { FIELDS.forEach(id => { const el = $(id); if (!el) return; if (el.type === 'checkbox') el.checked = false; else if (el.type === 'range') el.value = 0; else el.value = ''; }); }
