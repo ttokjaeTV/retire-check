@@ -1507,6 +1507,25 @@ function renderSummary(m) {
 }
 
 const TABS = ['1', '2', '3', '4', '5', '6', 'sum'];
+/* ===== 입력칸 숫자 뒤 단위 ===== */
+// 칸 안의 단위(.unit: 만원·세·년·%)를 입력한 숫자 바로 뒤로 옮긴다 (goal-calc·retirement와 같은 방식).
+// 값이 비었거나, 숫자가 길어 자리가 없으면 원래 자리(오른쪽 끝)에 그대로 둔다 — 단위가 이것 하나뿐이라 숨기지 않는다.
+const unitCanvas = document.createElement('canvas').getContext('2d');
+function placeUnits() {
+  document.querySelectorAll('.input-wrap > input + .unit').forEach(tag => {
+    const inp = tag.previousElementSibling;
+    const atEdge = () => { tag.style.left = ''; tag.style.right = ''; };
+    if (!inp || inp.value === '' || !inp.offsetWidth) { atEdge(); return; }
+    const cs = getComputedStyle(inp);
+    unitCanvas.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const w = unitCanvas.measureText(inp.value).width;
+    const left = parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth) + w + 4 - inp.scrollLeft;
+    const edgeLeft = inp.offsetWidth - 14 - tag.offsetWidth;   // CSS 기본 자리(right: 14px)의 왼쪽 끝
+    if (left > edgeLeft) { atEdge(); return; }
+    tag.style.left = Math.round(left) + 'px'; tag.style.right = 'auto';
+  });
+}
+
 function renderTabs() {
   document.querySelectorAll('.tab').forEach(b => {
     const k = b.dataset.tab, on = k === S.tab;
@@ -1519,6 +1538,7 @@ function renderTabs() {
   document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('on', p.dataset.pane === S.tab));
   const bar = $('tabs'), act = bar.querySelector('.tab.on');   // 휴대폰: 고른 탭이 가로 스크롤 안에 보이게
   if (act && bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: act.offsetLeft - (bar.clientWidth - act.offsetWidth) / 2, behavior: 'smooth' });
+  placeUnits();   // 탭을 바꾸면 새로 보이는 칸의 단위 자리를 다시 잰다
 }
 function showTab(id, scroll) {
   if (!TABS.includes(String(id))) id = '1';
@@ -1623,6 +1643,9 @@ $('saveImg').addEventListener('click', async () => {
 
 if (load()) restore(); else applyExample();
 renderAll();
+document.addEventListener('toggle', placeUnits, true);   // 접힌 칸(details)을 펼칠 때
+let unitT = null; window.addEventListener('resize', () => { clearTimeout(unitT); unitT = setTimeout(placeUnits, 200); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeUnits);   // 웹폰트가 늦게 뜨면 폭을 다시 잰다
 </script>
 </body>
 </html>
