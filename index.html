@@ -252,6 +252,11 @@
   .btn:hover { background: var(--accent); }
   .btn-out { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1.5px solid var(--accent); color: var(--accent); padding: 11px 16px; border-radius: 12px; font-weight: 800; font-size: 14px; text-decoration: none; }
   .btn-out:hover { background: var(--accent-soft); }
+  button.btn-out { font-family: inherit; cursor: pointer; }
+  .act-btns { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  .lever .s a { color: var(--accent); font-weight: 800; white-space: nowrap; }
+  details.method { margin-top: 24px; }
+  .footer-safe { display: block; margin-top: 8px; color: var(--ink-soft); font-weight: 600; }
 
   /* 점검표 */
   
@@ -589,7 +594,10 @@
 <li>건강보험공단은 해마다 전년도 소득·재산 자료로 자격을 다시 봅니다. 기준선 근처라면 매년 확인하세요.</li></ul>
 <p class="src">사적연금 제외는 현행 기준이며, 제도 개편 논의가 있어 매년 확인이 필요합니다. 정확한 판정은 국민건강보험공단(1577-1000)에서 확인하세요.</p>
 </div></details>
-      <div class="step-actions"><span></span><button class="btn" data-next="6" type="button">다음: 점검표 →</button></div>
+      <div class="step-actions">
+        <a class="btn-out" href="https://ttokjaetv.github.io/fin-income-tax/" target="_blank" rel="noopener">배당·이자 종합과세·건보료 계산기 ↗</a>
+        <button class="btn" data-next="6" type="button">다음: 점검표 →</button>
+      </div>
     </div>
   </section>
 
@@ -616,7 +624,10 @@
       </div>
       <div class="step-actions">
         <span class="note" style="margin:0">숫자를 바꾸고 싶으면 위 단계로 돌아가 고치면 바로 반영됩니다.</span>
-        <button class="btn" id="saveImg" type="button">이미지로 저장</button>
+        <span class="act-btns">
+          <button class="btn-out" id="copyTxt" type="button" title="카페 댓글·카톡에 붙여넣을 수 있게 글로 복사합니다">결과 글로 복사</button>
+          <button class="btn" id="saveImg" type="button">이미지로 저장</button>
+        </span>
       </div>
     </div>
   </section>
@@ -630,12 +641,33 @@
     </div>
   </div>
 
+  <details class="more method">
+    <summary>계산 방법과 가정 · 계산에 넣지 않은 것</summary>
+    <div class="more-body">
+<h4>계산 방법과 가정</h4>
+<ul><li><b>최종 진단</b>: 은퇴 전에는 해마다 '자산 × (1 + 수익률) + 월 저축 × 12'로 불립니다. 은퇴 후에는 매년 초 '생활비 − 국민연금'만큼 꺼내고, 남은 돈을 같은 수익률로 굴립니다. 생활비와 국민연금은 해마다 물가만큼 오른다고 봤습니다.</li>
+<li><b>은퇴 때 필요한 돈</b>: 은퇴 후 해마다 모자라는 돈(생활비 − 국민연금)을 수익률로 할인해, 은퇴하는 날 한꺼번에 있어야 할 금액으로 바꾼 값입니다. 진단 금액은 모두 물가를 걷어낸 지금 돈 가치입니다.</li>
+<li><b>부족분을 메우는 방법</b>: 나머지 조건은 그대로 두고 수익률·저축·생활비·은퇴 나이 중 하나만 바꿔, 계획 나이까지 버티는 경계값을 찾았습니다.</li>
+<li><b>소득 공백(2·3단계)</b>: (국민연금 개시 나이 − 은퇴 나이) × 월 생활비 × 12. 여기와 3단계 시점별 비교표는 물가 인상을 넣지 않은 단순 합계입니다.</li>
+<li><b>연금 첫해 인출(4단계)</b>: ① 세액공제 안 받은 원금 → ② 퇴직금 → ③ 세액공제분·수익 순서로 빠진다고 보고, 세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했습니다.</li>
+<li><b>ISA 연금 이전 환급(5단계)</b>: 옮긴 돈의 10%(최대 300만원) × 세액공제율(16.5% 또는 13.2%).</li>
+<li><b>건보료 피부양자(6단계)</b>: 본인·배우자의 판정 소득을 각각 기준선과 비교합니다. 기준은 맨 아래 제도 기준을 따릅니다.</li></ul>
+<h4>계산에 넣지 않은 것</h4>
+<ul><li>최종 진단에는 세금·건보료가 빠져 있습니다. 실제로 쓸 수 있는 돈은 이보다 조금 적습니다.</li>
+<li>해마다 오르내리는 수익률. 매년 같은 수익률로 굴린다고 봐서, 은퇴 직후 하락장을 먼저 만나는 경우는 따로 반영되지 않습니다.</li>
+<li>4단계는 첫해만 계산했고, 국민연금 말고 다른 종합소득은 없다고 봤습니다.</li>
+<li>ISA·일반계좌에서 꺼낼 때 내는 세금, 집·주택연금 같은 부동산, 은퇴 후 근로소득(6단계 건보료 판정에만 씁니다), 의료비·자녀 결혼 같은 목돈 지출.</li>
+<li>건보료의 배우자 재산 기준과 부양 관계 요건, 피부양자에서 빠졌을 때 내는 지역가입자 보험료 금액.</li></ul>
+    </div>
+  </details>
+
   <footer>
     ※ 본 가이드는 2026년 10월 확인한 세법·제도 기준의 단순 계산 도구이며, 개인의 실제 세금·건보료와 다를 수 있습니다. 투자·세무 판단의 근거로 단독 사용하지 마시고, 최신 기준은 국세청·국민건강보험공단·국민연금공단에서 확인하세요.<br>
     · 연금소득세 3.3~5.5%, 사적연금 연 1,500만원 기준, 연금수령한도 = 평가액 ÷ (11 − 연금수령연차) × 120%, 퇴직금 연금수령 시 퇴직소득세 30%(10년차까지)·40%(11~20년차)·50%(20년 초과) 감면<br>
-    · 국민연금 조기수령 1년당 6% 감액(최대 5년), 연기 1년당 7.2% 증액(최대 5년). 물가 연동 인상은 반영하지 않았습니다.<br>
+    · 국민연금 조기수령 1년당 6% 감액(최대 5년), 연기 1년당 7.2% 증액(최대 5년)<br>
     · ISA 만기 후 60일 이내 연금계좌 이전 시 이전액의 10%, 최대 300만원 추가 세액공제<br>
-    · 건보료 피부양자: 합산소득 연 2,000만원 이하(공적연금 전액, 금융소득은 1,000만원 초과 시 전액 합산, 사적연금 제외), 재산세 과세표준 5.4억원 초과~9억원 이하면 소득 1,000만원 이하, 9억원 초과면 제외. 부양 관계 요건은 반영하지 않았습니다.
+    · 건보료 피부양자: 합산소득 연 2,000만원 이하(공적연금 전액, 금융소득은 1,000만원 초과 시 전액 합산, 사적연금 제외), 재산세 과세표준 5.4억원 초과~9억원 이하면 소득 1,000만원 이하, 9억원 초과면 제외
+    <span class="footer-safe">🔒 입력한 숫자는 이 브라우저 안에서만 계산되며, 서버로 보내지 않습니다. 다시 열었을 때 이어 볼 수 있도록 입력값은 이 기기 브라우저에만 저장되고, '모두 비우고 시작'을 누르면 지워집니다.</span>
   </footer>
 </div>
 
@@ -1058,14 +1090,18 @@ function chartSVG(d) {
     ${ticks.map(a => `<text x="${X(a)}" y="${H - 10}" font-size="11.5" text-anchor="middle" fill="#8B8276">${a}세</text>`).join('')}
   </svg>`;
 }
+let LAST = { m: null, d: null };   // 결과 복사용: 화면에 그린 마지막 계산값
 function renderDiag(m) {
+  LAST.d = null;
   if (m.total <= 0) { $('diagBox').innerHTML = `<div class="diag"><div class="diag-k">최종 진단</div><div class="diag-v">1단계에 자산을 넣으면 진단이 나옵니다</div><div class="diag-s">몇 살까지 버티는지, 얼마가 부족한지, 무엇을 바꾸면 되는지를 숫자로 보여드립니다.</div></div>`; return; }
   const d = planDiag(m), b = d.b;
+  LAST.d = d;
   const rpct = v => (Math.round(v * 1000) / 10).toLocaleString('ko-KR') + '%';
   const row = (l, r, hl) => `<div class="diag-row${hl ? ' hl' : ''}"><span class="l">${l}</span><span class="r">${r}</span></div>`;
   let head;
   if (d.ok) {
     const endReal = Math.max(0, d.res.endBal / Math.pow(1 + b.inf, b.endAge + 1 - b.curAge));
+    d.endReal = endReal;
     head = `<div class="diag"><div class="diag-k">최종 진단</div>
       <div class="diag-v">${b.endAge}세까지 <em>버팁니다</em></div>
       <div class="diag-rows">
@@ -1077,6 +1113,7 @@ function renderDiag(m) {
       <div class="diag-foot">금액은 모두 지금 돈 가치 기준</div></div>`;
   } else {
     const shortReal = Math.max(0, d.gap) / d.defl;
+    d.shortReal = shortReal;
     head = `<div class="diag"><div class="diag-k">최종 진단</div>
       <div class="diag-v">지금 계획이면 <em>${d.res.deplete}세</em>에 바닥납니다</div>
       <div class="diag-rows">
@@ -1093,7 +1130,7 @@ function renderDiag(m) {
   let levers;
   if (!d.ok) {
     const c1 = d.reqR === null ? card('수익률', '수익률만으로는 어렵습니다', '연 30%로 굴려도 부족합니다. 다른 방법과 함께 써야 합니다.', true)
-      : card('수익률', `연 ${rpct(d.reqR)}로 올리기`, `지금 가정 ${m.rr}%보다 <b>${rpct(d.reqR - b.r)}p</b> 높아야 합니다. 수익률을 올리면 하락장 변동도 커지니 은퇴 직전 몇 년은 특히 조심하세요.`);
+      : card('수익률', `연 ${rpct(d.reqR)}로 올리기`, `지금 가정 ${m.rr}%보다 <b>${rpct(d.reqR - b.r)}p</b> 높아야 합니다. 수익률을 올리면 하락장 변동도 커지니 은퇴 직전 몇 년은 특히 조심하세요. <a href="https://ttokjaetv.github.io/loss-recovery/" target="_blank" rel="noopener">손실 복구 계산기 ↗</a>`);
     const c2 = d.yrsToRet <= 0 ? card('저축', '해당 없음', '이미 은퇴 나이라 더 모을 기간이 없습니다.', true)
       : d.extraSave === null ? card('저축', '저축만으로는 어렵습니다', `남은 ${d.yrsToRet}년 동안 매달 5,000만원을 더 모아도 부족합니다.`, true)
       : card('저축', `매달 ${fmtMan(Math.ceil(d.extraSave))} 더 모으기`, `은퇴까지 남은 <b>${d.yrsToRet}년</b> 동안, 지금 월 ${fmtMan(b.save)}에 더해서 모으면 됩니다.`);
@@ -1119,6 +1156,7 @@ function renderDiag(m) {
 }
 
 function renderSummary(m) {
+  LAST.m = m;
   renderDiag(m);
   const d = new Date();
   $('sumDate').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 작성 · ${m.birth}년생 · ${m.retireAge}세 은퇴 기준`;
@@ -1241,6 +1279,44 @@ $('saveImg').addEventListener('click', async () => {
     const canvas = await html2canvas($('sumCapture'), { backgroundColor: '#FBF7F0', scale: 2 });
     const a = document.createElement('a'); a.download = '은퇴5년전_점검표.png'; a.href = canvas.toDataURL('image/png'); a.click();
   } catch (e) { alert('이미지 저장에 실패했습니다. 화면을 캡처해 저장해 주세요.'); }
+});
+
+/* ===== 결과 글로 복사 (카페 댓글·카톡 붙여넣기용) ===== */
+function resultText() {
+  const m = LAST.m, d = LAST.d;
+  if (!m) return '';
+  const L = [];
+  const endAge = d ? d.b.endAge : m.endAge;
+  L.push(`[은퇴 5년 전 점검표] ${m.birth}년생 · ${m.retireAge}세 은퇴 · ${endAge}세까지 계획`);
+  if (!d) { L.push('최종 진단: 1단계에 자산을 넣으면 나옵니다'); L.push(location.href.split(/[?#]/)[0]); return L.join('\n'); }
+  {
+    L.push(d.ok ? `최종 진단: ${endAge}세까지 버팁니다 · ${endAge}세에 남는 돈 ${fmtMan(d.endReal)}`
+      : `최종 진단: 지금 계획이면 ${d.res.deplete}세에 바닥 · 부족한 돈 ${fmtMan(d.shortReal)}`);
+    L.push(`은퇴 때 필요한 돈 ${fmtMan(d.res.PVneed / d.defl)} · 예상 자산 ${fmtMan(d.res.Aret / d.defl)} (지금 돈 가치, 수익률 ${m.rr}%·물가 ${m.inf}%)`);
+  }
+  const short = Math.max(0, m.gapNeed - m.bridge);
+  L.push(`노후 자산 ${fmtMan(m.total)} (연금계좌 ${pct(m.total ? m.pensionTotal / m.total * 100 : 0)}) · 소득 공백 ${m.gap}년${m.gap === 0 ? '' : short > 0 ? `, ISA·일반으로 ${fmtMan(short)} 부족` : ', ISA·일반으로 충당 가능'}`);
+  const lim = isFinite(m.limit) ? fmtMan(m.limit) : '한도 없음';
+  L.push(`국민연금 ${m.npsStart}세부터 ${m.nps ? '월 ' + fmtMan(m.npsSel) : '(예상액 미입력)'} · 연금 첫해 인출 ${fmtMan(m.wAmt)} (한도 ${lim}${m.engine ? `, 세금 약 ${fmtMan(m.engine.tax)}` : ''}${m.cOk ? '' : ', 1,500만원 초과'})`);
+  L.push(`ISA→연금 이전 환급 약 ${fmtMan(m.isaRefund)} · 건보료 피부양자 ${m.hi === 'ok' ? '유지' : m.hi === 'warn' ? '경계' : '제외 가능'} (본인 판정 소득 ${fmtMan(m.myInc)})`);
+  L.push(location.href.split(/[?#]/)[0]);
+  return L.join('\n');
+}
+async function copyResult(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+  } catch (e) { return false; }
+}
+let copyT = null;
+$('copyTxt').addEventListener('click', async () => {
+  const btn = $('copyTxt'), text = resultText();
+  const ok = text && await copyResult(text);
+  btn.textContent = ok ? '복사했습니다' : '복사하지 못했습니다';
+  clearTimeout(copyT); copyT = setTimeout(() => { btn.textContent = '결과 글로 복사'; }, 1800);
 });
 
 /* 유입 꼬리표를 바깥 링크에 이어 붙임 */
