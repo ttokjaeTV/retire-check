@@ -69,6 +69,10 @@
   .more-body table.mini { margin-top: 8px; }
   /* 최종 진단 */
   .assume { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-top: 18px; }
+  .assume-read { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-top: 18px; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+  .assume-read button { background: var(--white); border: 1.5px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 6px 14px; font-family: inherit; font-weight: 800; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .pf-box { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
   .assume-t { font-size: 13px; font-weight: 800; color: var(--ink-soft); margin-bottom: 10px; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .diag { background: var(--dark-warm); color: var(--white); border-radius: 18px; padding: 24px; margin-bottom: 14px; }
@@ -612,6 +616,37 @@
           <div class="guide-warn"><b>꼭 알아두세요</b> · 세액공제 받지 않은 원금(<span class="gbn n1">1</span>)은 금융회사가 따로 관리하고 있어야 세금 없이 인출돼요. 연금 개시 전에 금융회사에 확인하고, 필요하면 서류 3을 제출해 '과세제외금액'으로 등록해 두세요. 등록하지 않으면 세액공제 받은 원금(<span class="gbn n3">3</span>)으로 취급되어 연금소득세가 붙을 수 있습니다.</div>
         </div>
       </details>
+      <div class="assume">
+        <div class="assume-t">앞으로의 운용 가정 — 은퇴 전후로 계속 투자한다고 보고, 3·4단계와 점검표가 모두 이 숫자로 계산됩니다</div>
+        <div class="grid-2">
+          <div class="field pf-box">
+            <label class="label" for="rrPre">은퇴 전 포트폴리오 · 연 수익률 (세후)</label>
+            <div class="chip-row" id="chipsPre">
+              <button type="button" class="chip" data-set="rrPre" data-v="6">성장형 6%</button>
+              <button type="button" class="chip" data-set="rrPre" data-v="5">균형형 5%</button>
+              <button type="button" class="chip" data-set="rrPre" data-v="4">안정형 4%</button>
+            </div>
+            <div class="input-wrap"><input type="number" id="rrPre" step="any" min="-5" max="20" placeholder="6"><span class="unit">%</span></div>
+            <div class="input-hint">모으는 시기라 수익률을 높이는 구성. 성장형은 주식 80% 이상(지수 ETF 중심), 균형형은 주식 60 : 채권 40, 안정형은 주식 40% 이하로 보고 잡은 값입니다.</div>
+          </div>
+          <div class="field pf-box">
+            <label class="label" for="rr">은퇴 후 포트폴리오 · 연 수익률 (세후)</label>
+            <div class="chip-row" id="chipsPost">
+              <button type="button" class="chip" data-set="rr" data-v="5">성장 유지형 5%</button>
+              <button type="button" class="chip" data-set="rr" data-v="4">인컴형 4%</button>
+              <button type="button" class="chip" data-set="rr" data-v="3">안정 인출형 3%</button>
+            </div>
+            <div class="input-wrap"><input type="number" id="rr" step="any" min="-5" max="20" placeholder="4"><span class="unit">%</span></div>
+            <div class="input-hint">꺼내 쓰는 시기라 변동을 줄이는 구성. 인컴형은 고배당·커버드콜·채권을 섞어 매달 현금이 나오게 한 구성입니다. 커버드콜은 분배율이 높아도 주가가 오를 때 상승분 일부를 포기하므로, <b>분배율이 아니라 총수익(분배 + 가격 변동)</b>으로 잡으세요.</div>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-top:14px">
+          <div class="field"><label class="label" for="inf">물가상승률 (연)</label><div class="input-wrap"><input type="number" id="inf" step="0.5" min="0" max="10" placeholder="2.5"><span class="unit">%</span></div><div class="input-hint">한국은행 물가안정목표는 2%입니다.</div></div>
+          <div class="field"><label class="label" for="endAge">몇 세까지 계획</label><div class="input-wrap"><input type="number" id="endAge" min="70" max="110" placeholder="90"><span class="unit">세</span></div><div class="input-hint">60세 은퇴, 90세까지면 30년</div></div>
+          <div class="field"><label class="label" for="save">은퇴 전까지 월 저축</label><div class="input-wrap"><input type="text" inputmode="numeric" id="save" data-money placeholder="0"><span class="unit">만원</span></div></div>
+        </div>
+        <p class="note" style="margin-top:12px">수익률은 계획을 세우기 위한 가정이지 과거 성과나 미래를 보장하는 숫자가 아닙니다. 낮게 잡을수록 안전한 계획이 됩니다.</p>
+      </div>
 
       <div class="result" id="r1"></div>
 
@@ -885,15 +920,7 @@
     <div class="step-label"><div class="step-line"></div><span class="step-text">RESULT</span></div>
     <h2 class="step-title">나의 은퇴 5년 전 점검표</h2>
     <div class="sum-body">
-      <div class="assume">
-        <div class="assume-t">계산 가정 — 바꾸면 아래 진단이 바로 다시 계산됩니다</div>
-        <div class="grid-4">
-          <div class="field"><label class="label" for="rr">연 수익률 (세후)</label><div class="input-wrap"><input type="number" id="rr" step="any" min="-5" max="20" placeholder="4"><span class="unit">%</span></div></div>
-          <div class="field"><label class="label" for="inf">물가상승률 (연)</label><div class="input-wrap"><input type="number" id="inf" step="0.5" min="0" max="10" placeholder="2.5"><span class="unit">%</span></div></div>
-          <div class="field"><label class="label" for="endAge">몇 세까지 계획</label><div class="input-wrap"><input type="number" id="endAge" min="70" max="110" placeholder="90"><span class="unit">세</span></div><div class="input-hint">60세 은퇴, 90세까지면 30년</div></div>
-          <div class="field"><label class="label" for="save">은퇴 전까지 월 저축</label><div class="input-wrap"><input type="text" inputmode="numeric" id="save" data-money placeholder="0"><span class="unit">만원</span></div></div>
-        </div>
-      </div>
+      <div class="assume-read" id="assumeRead"></div>
       <div class="sum-wrap" id="sumCapture">
         <div class="sum-title" style="margin-top:18px">은퇴 5년 전 점검표</div>
         <div class="sum-date" id="sumDate"></div>
@@ -1063,7 +1090,8 @@ function model() {
   m.isaDate = $('isaDate').value;
   m.fin = num('fin');
 
-  m.rr = has('rr') ? clamp(num('rr'), -5, 20) : 4;
+  m.rr = has('rr') ? clamp(num('rr'), -5, 20) : 4;            // 은퇴 후 수익률
+  m.rrPre = has('rrPre') ? clamp(num('rrPre'), -5, 20) : 6;     // 은퇴 전 수익률
   m.inf = has('inf') ? clamp(num('inf'), 0, 10) : 2.5;
   m.endAge = has('endAge') ? clamp(num('endAge'), 70, 110) : 90;
   m.save = num('save');
@@ -1082,6 +1110,13 @@ function model() {
 /* ===== 렌더 ===== */
 function stat(label, value, sub, accent) { return `<div class="stat-card${accent ? ' accent' : ''}"><div class="stat-label">${label}</div><div class="stat-value">${value}</div>${sub ? `<div class="stat-sub">${sub}</div>` : ''}</div>`; }
 
+function growBox(m) {
+  const b = planBase(m), yrs = Math.max(0, b.retireAge - b.curAge);
+  if (m.total <= 0 && m.save <= 0) return '';
+  if (yrs === 0) return `<div class="verdict" style="margin-top:16px">이미 은퇴 나이(${b.retireAge}세)에 도달해, 지금 자산이 그대로 은퇴 자산입니다. 앞으로는 은퇴 후 연 ${m.rr}% 수익률로 굴리며 꺼내 쓴다고 보고 계산합니다.</div>`;
+  const A = lifeSim(b).Aret / Math.pow(1 + b.inf, yrs);
+  return `<div class="verdict ok" style="margin-top:16px">지금 <b>${fmtMan(m.total)}</b>을 은퇴 전 연 ${m.rrPre}%로 굴리고${m.save > 0 ? ` 매달 ${fmtMan(m.save)}씩 더 모으면` : ' 추가 저축 없이 두면'}, ${b.retireAge}세(${m.birth + b.retireAge}년) 은퇴 때 금융자산은 약 <b>${fmtMan(A)}</b>입니다. <span style="font-weight:600">지금 돈 가치(물가 ${m.inf}% 반영) 기준이에요.</span></div>`;
+}
 function render1(m) {
   const parts = [
     ['퇴직금', m.retire, '#D9542B', '#FFFFFF'], ['연금저축·IRP', m.ps + m.irp, '#E89A6F', '#3A2F26'],
@@ -1101,6 +1136,7 @@ function render1(m) {
       ${stat('55세 전에도 쓸 수 있는 돈', fmtMan(m.bridge), 'ISA + 일반계좌')}
       ${stat('국민연금 예상', m.nps ? '월 ' + fmtMan(m.nps) : '미입력', '정상 수령 기준')}
     </div>
+    ${growBox(m)}
     <p class="note">연금계좌 돈은 55세부터 연금으로 꺼낼 수 있고, 꺼내는 순서와 금액에 따라 세금이 달라집니다. 그 이야기는 4단계에서 합니다.</p>`;
 }
 
@@ -1184,7 +1220,7 @@ function render3(m) {
   }
   const viewSeg = `<div class="seg" id="npsView" style="margin-top:22px"><button type="button" data-view="pv" class="${view === 'pv' ? 'on' : ''}">수익률 반영 (오늘 가치)</button><button type="button" data-view="simple" class="${view === 'simple' ? 'on' : ''}">단순 합계</button></div>`;
   const viewNote = view === 'pv'
-    ? `국민연금은 매년 물가만큼 올라 오늘 돈 가치는 그대로라고 보고, 일찍 받은 돈은 굴릴 수 있다고 봐 <b>수익률 ${m.rr}% − 물가 ${m.inf}%</b>(점검표 탭 가정)로 누적액을 오늘 가치로 환산했습니다. 수익률이 높을수록 일찍 받는 쪽이 유리해집니다.`
+    ? `국민연금은 매년 물가만큼 올라 오늘 돈 가치는 그대로라고 보고, 일찍 받은 돈은 굴릴 수 있다고 봐 <b>은퇴 후 수익률 ${m.rr}% − 물가 ${m.inf}%</b>(1단계 운용 가정)로 누적액을 오늘 가치로 환산했습니다. 수익률이 높을수록 일찍 받는 쪽이 유리해집니다.`
     : `물가 연동 인상과 운용 수익을 빼고 받는 돈을 그대로 더했습니다.`;
   const short = Math.max(0, m.gapNeed - m.bridge);
   const maxBar = Math.max(m.gapNeed, m.bridge, 1);
@@ -1283,7 +1319,7 @@ function splitBlock(m) {
       <div><b class="h">아직 넣는 중이라면</b>세액공제 한도(연금저축 600만원, IRP 합산 900만원)를 넘겨 넣을 돈은 <b>별도 연금저축 계좌</b>에, 퇴직금은 <b>새 IRP</b>로 받으세요.</div>
       <div><b class="h">이미 한 계좌에 섞여 있다면</b>개시 전에 연금저축에서 ① 금액만큼만 빼면 세금이 없습니다(금융회사에 '과세제외금액'으로 등록돼 있어야 함). 이 돈은 예금·ISA에 두고 보충용으로 쓰세요. IRP는 법정 사유가 있어야 일부 인출이 됩니다.</div>
     </div>
-    <p class="note">계좌 나누기 표는 수익률 ${m.rr}%(점검표 탭 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 계좌를 하나로 합쳐 본 근사치라 실제 수령한도·감면 연차는 계좌마다 따로 계산됩니다.</p>
+    <p class="note">계좌 나누기 표는 은퇴 후 수익률 ${m.rr}%(1단계 운용 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 계좌를 하나로 합쳐 본 근사치라 실제 수령한도·감면 연차는 계좌마다 따로 계산됩니다.</p>
   </div>`;
 }
 
@@ -1395,17 +1431,17 @@ function render6(m) {
 function lifeSim(p) {
   const path = []; let A = p.A0, deplete = null, PVneed = 0, Aret = null;
   const startRet = Math.max(p.retireAge, p.curAge);
-  const rm = Math.pow(1 + p.r, 1 / 12) - 1;
+  const rm = Math.pow(1 + p.rPre, 1 / 12) - 1;
   const yearSave = rm === 0 ? p.save * 12 : p.save * (Math.pow(1 + rm, 12) - 1) / rm;   // 매달 말 월 저축 12번의 연말 가치
-  for (let a = p.curAge; a < startRet; a++) { path.push({ age: a, A }); A = A * (1 + p.r) + yearSave; }
+  for (let a = p.curAge; a < startRet; a++) { path.push({ age: a, A }); A = A * (1 + p.rPre) + yearSave; }
   Aret = A;
   for (let a = startRet; a < p.endAge; a++) {
     const g = Math.pow(1 + p.inf, a - p.curAge);
     const w = p.living * 12 * g - (a >= p.npsStart ? p.nps * 12 * g : 0);
-    PVneed += Math.max(0, w) / Math.pow(1 + p.r, a - startRet);
+    PVneed += Math.max(0, w) / Math.pow(1 + p.rPost, a - startRet);
     path.push({ age: a, A: Math.max(0, A) });
     if (deplete === null && w > 0 && A < w) deplete = a;
-    A = (A - w) * (1 + p.r);
+    A = (A - w) * (1 + p.rPost);
   }
   path.push({ age: Math.max(p.endAge, startRet), A: Math.max(0, A) });   // 계획 나이에 남은 돈
   return { path, deplete, Aret, PVneed, endBal: A, startRet };
@@ -1414,7 +1450,7 @@ const okSim = p => lifeSim(p).deplete === null;
 function bisect(f, lo, hi, n = 40) { for (let i = 0; i < n; i++) { const mid = (lo + hi) / 2; if (f(mid)) hi = mid; else lo = mid; } return hi; }
 function planBase(m) {
   const curAge = clamp(new Date().getFullYear() - m.birth, 20, 100);
-  return { A0: m.total, save: m.save, r: m.rr / 100, inf: m.inf / 100, curAge, retireAge: m.retireAge,
+  return { A0: m.total, save: m.save, rPre: m.rrPre / 100, rPost: m.rr / 100, inf: m.inf / 100, curAge, retireAge: m.retireAge,
     endAge: Math.max(m.endAge, Math.max(m.retireAge, curAge) + 1), living: m.living, nps: m.npsSel, npsStart: m.npsStart };
 }
 function planDiag(m) {
@@ -1422,7 +1458,9 @@ function planDiag(m) {
   const yrsToRet = Math.max(0, b.retireAge - b.curAge), defl = Math.pow(1 + b.inf, yrsToRet);
   const d = { b, res, ok, yrsToRet, defl, gap: res.PVneed - res.Aret };
   // ① 필요 수익률
-  d.reqR = okSim({ ...b, r: -0.05 }) ? -0.05 : (okSim({ ...b, r: 0.3 }) ? bisect(r => okSim({ ...b, r }), -0.05, 0.3) : null);
+  const sh = x => ({ ...b, rPre: b.rPre + x, rPost: b.rPost + x });   // 은퇴 전·후 수익률을 같은 폭으로 움직임
+  const lo = -0.05 - Math.max(b.rPre, b.rPost), hi = 0.3;
+  d.reqD = okSim(sh(lo)) ? lo : (okSim(sh(hi)) ? bisect(x => okSim(sh(x)), lo, hi) : null);
   // ② 추가 월 저축
   d.extraSave = yrsToRet <= 0 ? null : (okSim({ ...b, save: b.save + 5000 }) ? bisect(sv => okSim({ ...b, save: sv }), b.save, b.save + 5000) - b.save : null);
   // ③ 지속 가능한 월 생활비
@@ -1486,12 +1524,12 @@ function renderDiag(m) {
       </div>
       <div class="diag-foot">금액은 모두 지금 돈 가치 기준</div></div>`;
   }
-  const chart = `<div class="chart-box">${chartSVG(d)}<div class="chart-cap">나이별 금융자산 (지금 돈 가치) · 세후 수익률 ${m.rr}% · 물가 ${m.inf}% · 생활비 월 ${fmtMan(m.living)} · 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}</div></div>`;
+  const chart = `<div class="chart-box">${chartSVG(d)}<div class="chart-cap">나이별 금융자산 (지금 돈 가치) · 수익률 은퇴 전 ${m.rrPre}% · 은퇴 후 ${m.rr}% · 물가 ${m.inf}% · 생활비 월 ${fmtMan(m.living)} · 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}</div></div>`;
   const card = (n, v, sTxt, na) => `<div class="lever${na ? ' na' : ''}"><span class="n">${n}</span><div class="v">${v}</div><div class="s">${sTxt}</div></div>`;
   let levers;
   if (!d.ok) {
-    const c1 = d.reqR === null ? card('수익률', '수익률만으로는 어렵습니다', '연 30%로 굴려도 부족합니다. 다른 방법과 함께 써야 합니다.', true)
-      : card('수익률', `연 ${rpct(d.reqR)}로 올리기`, `지금 가정 ${m.rr}%보다 <b>${rpct(d.reqR - b.r)}p</b> 높아야 합니다. 수익률을 올리면 하락장 변동도 커지니 은퇴 직전 몇 년은 특히 조심하세요.`);
+    const c1 = d.reqD === null ? card('수익률', '수익률만으로는 어렵습니다', '연 30%로 굴려도 부족합니다. 다른 방법과 함께 써야 합니다.', true)
+      : card('수익률', `은퇴 전 ${rpct(b.rPre + d.reqD)} · 은퇴 후 ${rpct(b.rPost + d.reqD)}로 올리기`, `지금 가정(은퇴 전 ${m.rrPre}% · 은퇴 후 ${m.rr}%)보다 각각 <b>${rpct(d.reqD)}p</b> 높아야 합니다. 수익률을 올리면 하락장 변동도 커지니 은퇴 직전 몇 년은 특히 조심하세요.`);
     const c2 = d.yrsToRet <= 0 ? card('저축', '해당 없음', '이미 은퇴 나이라 더 모을 기간이 없습니다.', true)
       : d.extraSave === null ? card('저축', '저축만으로는 어렵습니다', `남은 ${d.yrsToRet}년 동안 매달 5,000만원을 더 모아도 부족합니다.`, true)
       : card('저축', `매달 ${fmtMan(Math.ceil(d.extraSave))} 더 모으기`, `은퇴까지 남은 <b>${d.yrsToRet}년</b> 동안, 지금 월 ${fmtMan(b.save)}에 더해서 모으면 됩니다.`);
@@ -1501,7 +1539,7 @@ function renderDiag(m) {
     levers = `<div class="lever-t">부족분을 메우는 방법 — 하나만 골라도 됩니다</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때 필요한 숫자입니다. 두세 가지를 조금씩 섞으면 각각의 부담이 줄어듭니다.</div><div class="levers">${c1}${c2}${c3}${c4}</div>`;
   } else {
     const c1 = card('생활비 여유', `월 ${fmtMan(d.maxLiving)}까지 써도 됨`, `지금 계획보다 <b>${fmtMan(d.maxLiving - b.living)}</b> 더 써도 ${b.endAge}세까지 버팁니다(지금 돈 가치).`);
-    const c2 = card('필요 수익률', d.reqR <= -0.05 ? '수익률 0%여도 충분' : `연 ${rpct(Math.max(d.reqR, 0))}면 충분`, `지금 가정 ${m.rr}%보다 낮아도 됩니다. 은퇴 직전에는 변동이 작은 자산 비중을 늘려 지키는 쪽을 고민해 볼 만합니다.`);
+    const c2 = card('필요 수익률', `은퇴 전 ${rpct(Math.max(b.rPre + d.reqD, 0))} · 은퇴 후 ${rpct(Math.max(b.rPost + d.reqD, 0))}면 충분`, `지금 가정(은퇴 전 ${m.rrPre}% · 은퇴 후 ${m.rr}%)보다 각각 <b>${rpct(-d.reqD)}p</b> 낮아도 됩니다. 은퇴 직전에는 변동이 작은 자산 비중을 늘려 지키는 쪽을 고민해 볼 만합니다.`);
     const c3 = d.earliest ? card('은퇴 시점', `${d.earliest}세 은퇴도 가능`, `지금 계획(${b.retireAge}세)보다 ${b.retireAge - d.earliest}년 일찍 그만둬도 ${b.endAge}세까지 버팁니다.`) : card('은퇴 시점', `${b.retireAge}세 은퇴 유지`, '더 앞당기면 부족해집니다.', true);
     const c4 = card('더 오래 산다면', okSim({ ...b, endAge: b.endAge + 5 }) ? `${b.endAge + 5}세까지도 버팀` : `${b.endAge + 5}세까지는 부족`, `계획 나이를 5년 늘려 확인한 결과입니다. 장수 위험에 대비해 종신으로 나오는 국민연금의 비중을 함께 보세요.`);
     levers = `<div class="lever-t">여유를 쓰는 방법</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때의 숫자입니다.</div><div class="levers">${c1}${c2}${c3}${c4}</div>`;
@@ -1516,7 +1554,12 @@ function renderDiag(m) {
   $('diagBox').innerHTML = head + chart + levers + leakHtml + `<p class="note">수익률은 세후로 넣고, 연금소득세·건보료는 4·6단계에서 따로 봅니다. 생활비와 국민연금은 물가만큼 오르고, 자산은 매년 같은 수익률로 굴러간다고(월 복리·매달 말 저축) 가정했습니다. 실제 수익률은 해마다 오르내립니다.<br>필요 자산은 은퇴 나이부터 ${b.endAge}세 전까지 ${Math.max(0, b.endAge - d.res.startRet)}년 동안 꺼내 쓰면 딱 바닥나는 금액입니다. 4% 룰(현금흐름 역산 계산기)은 은퇴 초반 하락장까지 감안한 보수적 기준이라 보통 더 크게 나옵니다(수익률을 아주 낮게 잡으면 반대일 수도 있습니다).</p>`;
 }
 
+function renderAssumeRead(m) {
+  const el = $('assumeRead'); if (!el) return;
+  el.innerHTML = `<span><b>계산 가정</b> · 수익률 은퇴 전 ${m.rrPre}% · 은퇴 후 ${m.rr}% · 물가 ${m.inf}% · ${m.endAge}세까지 · 은퇴 전 월 저축 ${fmtMan(m.save)}</span><button type="button" data-goto="1">1단계에서 바꾸기</button>`;
+}
 function renderSummary(m) {
+  renderAssumeRead(m);
   renderDiag(m);
   const d = new Date();
   $('sumDate').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 작성 · ${m.birth}년생 · ${m.retireAge}세 은퇴 기준`;
@@ -1579,13 +1622,14 @@ function renderAll() {
   const m = model();
   render1(m); renderWi(m); render2(m); render3(m); render4(m); render5(m); render6(m); renderSummary(m);
   document.querySelectorAll('.chip-read[data-for]').forEach(el => { const id = el.dataset.for; el.textContent = has(id) && num(id) >= 10000 ? fmtMan(num(id)) : ''; });
+  document.querySelectorAll('[data-set]').forEach(c => { const id = c.dataset.set, v = has(id) ? num(id) : parseFloat($(id).placeholder); c.classList.toggle('on', v === parseFloat(c.dataset.v)); });
   markEdited();
   renderTabs();
   $('exampleNote').style.display = Object.keys(S.base).length ? '' : 'none';
 }
 
 /* ===== 이벤트 ===== */
-const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'biz', 'rr', 'inf', 'endAge', 'save'];
+const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'biz', 'rr', 'rrPre', 'inf', 'endAge', 'save'];
 function restore() {
   FIELDS.forEach(id => { const el = $(id); if (!el || !(id in S.v)) return; if (el.type === 'checkbox') el.checked = !!S.v[id]; else el.value = S.v[id]; });
 }
@@ -1625,7 +1669,7 @@ function exampleValues() {
   const d = new Date(); d.setFullYear(d.getFullYear() + 1);
   const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   return { retire: '20,000', ps: '13,000', irp: '5,000', isa: '4,000', gen: '6,000', nps: '150', noded: '3,000', prop: '30,000', wiInc: '7,000', wiEtc: '60,000', wiDebt: '5,000',
-    birth: '1971', retireAge: '60', living: '298', shift: '0', wAge: '60', retYears: '25', isaDate: iso, fin: '600', spNps: '50', rr: '4', inf: '2.5', endAge: '95', save: '50' };
+    birth: '1971', retireAge: '60', living: '298', shift: '0', wAge: '60', retYears: '25', isaDate: iso, fin: '600', spNps: '50', rr: '4', rrPre: '6', inf: '2.5', endAge: '95', save: '50' };
 }
 function clearFields() { FIELDS.forEach(id => { const el = $(id); if (!el) return; if (el.type === 'checkbox') el.checked = false; else if (el.type === 'range') el.value = 0; else el.value = ''; }); }
 function applyExample() { const ex = exampleValues(); S = { v: { ...ex }, base: { ...ex }, ok: [], example: true, tab: '1' }; save(); clearFields(); restore(); }
@@ -1640,6 +1684,7 @@ FIELDS.forEach(id => { const el = $(id); if (!el) return; el.addEventListener(el
 
 document.querySelectorAll('#livingChips .chip').forEach(c => c.addEventListener('click', () => { $('living').value = c.dataset.living; capture('living'); renderAll(); }));
 $('r3').addEventListener('click', e => { const b = e.target.closest('#npsView [data-view]'); if (!b) return; S.v.npsView = b.dataset.view; save(); renderAll(); });
+document.querySelectorAll('[data-set]').forEach(c => c.addEventListener('click', () => { const el = $(c.dataset.set); el.value = c.dataset.v; capture(c.dataset.set); renderAll(); }));
 document.querySelectorAll('#rateSeg button').forEach(b => b.addEventListener('click', () => { S.v.creditRate = b.dataset.rate; save(); renderAll(); }));
 
 document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => {
@@ -1647,6 +1692,7 @@ document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click'
   if (!S.ok.includes(String(k))) { S.ok.push(String(k)); save(); }
   showTab(k < 6 ? k + 1 : 'sum', true);
 }));
+document.addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (!b) return; showTab(b.dataset.goto, false); setTimeout(() => { const el = $('rr'); if (el) { window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' }); el.focus({ preventScroll: true }); } }, 50); });
 $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab, true); });
 
 $('resetBtn').addEventListener('click', () => { if (!confirm('입력한 내용을 지우고 예시 숫자로 처음부터 다시 시작할까요?')) return; applyExample(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
