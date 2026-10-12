@@ -1154,12 +1154,38 @@ function render3(m) {
   const rows = [[-5, '5년 당겨'], [0, '정상'], [5, '5년 미뤄']];
   if (![-5, 0, 5].includes(s)) rows.push([s, '선택한 시점']);
   rows.sort((a, b) => a[0] - b[0]);
-  const table = rows.map(([sh, nm]) => { const f = npsFactor(sh), st = m.npsStart0 + sh, mo = m.nps * f; return `<tr class="${sh === s ? 'sel' : ''}"><td><b class="when-nm">${nm}</b><span class="when-y">${m.birth + st}년 (${st}세)</span></td><td>월 ${fmtMan(mo)}</td><td>${fmtMan(cum(mo, st, 80))}</td><td>${fmtMan(cum(mo, st, 90))}</td></tr>`; }).join('');
+  /* 비교 방식: pv = 수익률 반영(오늘 가치, 기본) / simple = 단순 합계
+     국민연금은 매년 물가만큼 올라 오늘 돈 가치는 그대로 → 실질 할인율 = (1+수익률)/(1+물가) − 1 로 오늘 가치 환산 */
+  const view = S.v.npsView === 'simple' ? 'simple' : 'pv';
+  const dr = (1 + m.rr / 100) / (1 + m.inf / 100) - 1;
+  const curAge = new Date().getFullYear() - m.birth;
+  const base = Math.min(curAge, m.npsStart0 - 5);
+  const total = (mo, st, age) => {
+    if (view === 'simple') return cum(mo, st, age);
+    let t = 0; for (let a = st; a < age; a++) t += mo * 12 / Math.pow(1 + dr, a - base); return t;
+  };
+  const crossAge = sh => {            // 정상 수령과 누적액이 뒤집히는 나이
+    const f = npsFactor(sh), st = m.npsStart0 + sh, mo = m.nps * f;
+    for (let A = Math.max(st, m.npsStart0) + 1; A <= 120; A++) {
+      const x = total(mo, st, A), n = total(m.nps, m.npsStart0, A);
+      if (sh < 0 ? x < n : x > n) return A;
+    }
+    return null;
+  };
+  const table = rows.map(([sh, nm]) => { const f = npsFactor(sh), st = m.npsStart0 + sh, mo = m.nps * f; return `<tr class="${sh === s ? 'sel' : ''}"><td><b class="when-nm">${nm}</b><span class="when-y">${m.birth + st}년 (${st}세)</span></td><td>월 ${fmtMan(mo)}</td><td>${fmtMan(total(mo, st, 80))}</td><td>${fmtMan(total(mo, st, 90))}</td></tr>`; }).join('');
   let cross = '';
-  if (s !== 0 && m.nps > 0) {
-    const f = m.factor, a = (m.npsStart0 - f * m.npsStart) / (1 - f);
-    cross = s < 0 ? `당겨 받으면 <b>약 ${Math.ceil(a)}세</b>부터 정상 수령보다 누적액이 적어집니다.` : `미뤄 받으면 <b>약 ${Math.ceil(a)}세</b>부터 정상 수령보다 누적액이 많아집니다.`;
+  if (m.nps > 0) {
+    const say = sh => {
+      const A = crossAge(sh), when = A ? `<b>${A}세(${m.birth + A}년)</b>` : '';
+      if (sh < 0) return A ? `${-sh}년 당겨 받으면 ${when}부터 정상 수령보다 누적액이 적어집니다.` : `${-sh}년 당겨 받아도 120세까지 정상 수령보다 누적액이 적어지지 않습니다.`;
+      return A ? `${sh}년 미뤄 받으면 ${when}부터 정상 수령보다 누적액이 많아집니다.` : `${sh}년 미뤄 받으면 120세까지 정상 수령을 따라잡지 못합니다.`;
+    };
+    cross = s === 0 ? `${say(-5)}<br>${say(5)}` : say(s);
   }
+  const viewSeg = `<div class="seg" id="npsView" style="margin-top:22px"><button type="button" data-view="pv" class="${view === 'pv' ? 'on' : ''}">수익률 반영 (오늘 가치)</button><button type="button" data-view="simple" class="${view === 'simple' ? 'on' : ''}">단순 합계</button></div>`;
+  const viewNote = view === 'pv'
+    ? `국민연금은 매년 물가만큼 올라 오늘 돈 가치는 그대로라고 보고, 일찍 받은 돈은 굴릴 수 있다고 봐 <b>수익률 ${m.rr}% − 물가 ${m.inf}%</b>(점검표 탭 가정)로 누적액을 오늘 가치로 환산했습니다. 수익률이 높을수록 일찍 받는 쪽이 유리해집니다.`
+    : `물가 연동 인상과 운용 수익을 빼고 받는 돈을 그대로 더했습니다.`;
   const short = Math.max(0, m.gapNeed - m.bridge);
   const maxBar = Math.max(m.gapNeed, m.bridge, 1);
   let v;
@@ -1173,7 +1199,7 @@ function render3(m) {
       <div class="hbar-row"><span>ISA + 일반계좌</span><div class="hbar-track"><div class="hbar-fill" style="width:${m.bridge / maxBar * 100}%;background:var(--brown)"></div></div><span class="amt">${fmtMan(m.bridge)}</span></div>
     </div>
     ${v}${pre}
-    ${m.nps > 0 ? `<table class="mini"><thead><tr><th>받는 시점</th><th>월 수령액</th><th>80세까지 누적</th><th>90세까지 누적</th></tr></thead><tbody>${table}</tbody></table><p class="note">${cross} 물가 연동 인상은 빼고 단순 비교했습니다. 당겨 받기는 가입기간 10년 이상 등 조건이 있고, 감액률은 평생 고정됩니다.</p>` : '<p class="note">1단계에 국민연금 예상 월액을 넣으면 시점별 비교표가 나옵니다.</p>'}`;
+    ${m.nps > 0 ? `${viewSeg}<table class="mini" style="margin-top:12px"><thead><tr><th>받는 시점</th><th>월 수령액</th><th>80세까지 누적</th><th>90세까지 누적</th></tr></thead><tbody>${table}</tbody></table><div class="verdict" style="margin-top:12px">${cross}</div><p class="note">${viewNote} 당겨 받기는 가입기간 10년 이상 등 조건이 있고, 감액률은 평생 고정됩니다.</p>` : '<p class="note">1단계에 국민연금 예상 월액을 넣으면 시점별 비교표가 나옵니다.</p>'}`;
   /* 사용자가 실제로 입력한 값만 넘긴다 — 빈칸을 0으로 보내면 계산기 기본값이 지워짐 */
   const q3 = new URLSearchParams({ from: 'guide' });
   if (has('living')) q3.set('target-monthly', Math.round(m.living));
@@ -1613,6 +1639,7 @@ document.querySelectorAll('input[data-money]').forEach(el => {
 FIELDS.forEach(id => { const el = $(id); if (!el) return; el.addEventListener(el.type === 'checkbox' || el.type === 'range' || el.type === 'date' ? 'change' : 'input', () => { capture(id); renderAll(); }); if (el.type === 'range') el.addEventListener('input', () => { capture(id); renderAll(); }); });
 
 document.querySelectorAll('#livingChips .chip').forEach(c => c.addEventListener('click', () => { $('living').value = c.dataset.living; capture('living'); renderAll(); }));
+$('r3').addEventListener('click', e => { const b = e.target.closest('#npsView [data-view]'); if (!b) return; S.v.npsView = b.dataset.view; save(); renderAll(); });
 document.querySelectorAll('#rateSeg button').forEach(b => b.addEventListener('click', () => { S.v.creditRate = b.dataset.rate; save(); renderAll(); }));
 
 document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => {
