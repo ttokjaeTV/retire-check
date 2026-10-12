@@ -231,6 +231,55 @@
   .hbar-fill { height: 100%; }
   .hbar-row .amt { text-align: right; white-space: nowrap; }
 
+  /* 서류로 정확하게 채우는 법 (연금 인출 세금 시뮬레이터와 같은 모양) */
+  details.guide { border: 1.5px solid var(--beige-gold); background: #F7F0E4; border-radius: 16px; margin-top: 22px; }
+  details.guide > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+  details.guide > summary::-webkit-details-marker { display: none; }
+  .guide-ic { font-size: 26px; line-height: 1; }
+  .guide-sum-text { flex: 1; display: flex; flex-direction: column; }
+  .guide-sum-text b { font-size: 17px; font-weight: 900; letter-spacing: -0.4px; }
+  .guide-sum-text small { font-size: 13px; font-weight: 600; color: var(--ink-mute); margin-top: 2px; }
+  .fold-btn { font-size: 13px; font-weight: 800; color: var(--accent); white-space: nowrap; }
+  details.guide[open] .fold-btn .open-txt { display: none; }
+  details.guide:not([open]) .fold-btn .close-txt { display: none; }
+  .guide-body { padding: 4px 20px 22px; }
+  .guide-fast { background: var(--white); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; font-size: 14px; font-weight: 600; color: var(--ink-soft); line-height: 1.65; margin-bottom: 18px; }
+  .guide-fast b { color: var(--ink); font-weight: 800; }
+  .doc-step { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+  .doc-step-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .doc-no { font-size: 12px; font-weight: 900; color: var(--white); background: var(--dark-warm); padding: 4px 10px; border-radius: 999px; }
+  .doc-title { font-size: 17px; font-weight: 900; letter-spacing: -0.4px; }
+  .doc-for { font-size: 12px; font-weight: 800; color: var(--ink-mute); margin-left: auto; }
+  .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .how-t { font-size: 13px; font-weight: 900; color: var(--accent); margin: 2px 0 6px; }
+  .doc-how ol { padding-left: 20px; font-size: 14px; font-weight: 600; color: var(--ink-soft); line-height: 1.7; margin-bottom: 12px; }
+  .doc-how ol b, .doc-how p b { color: var(--ink); font-weight: 800; }
+  .doc-how p { font-size: 14px; font-weight: 600; color: var(--ink-soft); line-height: 1.65; margin-bottom: 10px; }
+  .mark { background: linear-gradient(transparent 55%, #FFE3A3 55%); font-weight: 800; color: var(--ink); }
+  .formula-box { background: var(--bg-alt); border-radius: 10px; padding: 12px 14px; font-size: 14px; font-weight: 700; line-height: 1.7; }
+  .formula-box .eq { font-size: 15px; font-weight: 900; color: var(--dark-warm); }
+  .formula-box small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-mute); margin-top: 6px; line-height: 1.55; }
+  .doc-mock { position: relative; background: #FFFFFF; border: 1px solid #CFC6B5; border-radius: 6px; padding: 18px 16px 14px; box-shadow: 0 2px 0 #E5DCC8, 0 6px 16px rgba(58,47,38,0.08); font-size: 12px; }
+  .mock-stamp { position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 900; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 6px; padding: 2px 8px; transform: rotate(4deg); background: #FFF6F1; }
+  .mock-title { text-align: center; font-size: 15px; font-weight: 900; letter-spacing: 1px; margin: 4px 0 12px; padding-bottom: 8px; border-bottom: 2px double #9B9387; }
+  .mock-sub { font-size: 12px; font-weight: 800; color: var(--ink-soft); margin: 10px 0 4px; }
+  .mock-tbl { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .mock-tbl th, .mock-tbl td { border: 1px solid #CFC6B5; padding: 6px 8px; font-weight: 600; }
+  .mock-tbl th { background: #F1ECE3; font-size: 11px; font-weight: 800; color: var(--ink-soft); text-align: center; line-height: 1.35; }
+  .mock-tbl td.r { text-align: right; white-space: nowrap; }
+  .mock-tbl tr.hl1 td { background: #F3EBDD; outline: 2px solid #C4A57B; outline-offset: -2px; }
+  .mock-tbl tr.hl2 td { background: #EFE4D3; outline: 2px solid #8B6F47; outline-offset: -2px; }
+  .mock-tbl tr.hl3 td { background: #FBE3D6; outline: 2px solid #D9542B; outline-offset: -2px; }
+  .mock-tbl tr.hlg td { background: #FFF3D6; outline: 2px solid #C9A227; outline-offset: -2px; }
+  .mock-arrow { margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--ink-soft); background: var(--bg); border-radius: 8px; padding: 9px 12px; }
+  .mock-arrow::before { content: '→ '; color: var(--accent); font-weight: 900; }
+  .mock-arrow b { color: var(--ink); font-weight: 900; }
+  .guide-warn { font-size: 13px; font-weight: 600; color: #7A2E14; background: #FBE3D6; border-radius: 10px; padding: 12px 14px; line-height: 1.65; }
+  .guide-warn b { font-weight: 900; }
+  .gbn { display: inline-flex; align-items: center; justify-content: center; width: 1.3em; height: 1.3em; border-radius: 50%; font-size: 0.78em; font-weight: 900; line-height: 1; vertical-align: 0.08em; color: #FFFFFF; }
+  .gbn.n1 { background: #C4A57B; color: #3A2F26; } .gbn.n2 { background: #8B6F47; } .gbn.n3 { background: #D9542B; }
+  a.hint-link { color: var(--accent); font-weight: 800; text-decoration: none; white-space: nowrap; }
+  a.hint-link:hover { text-decoration: underline; }
   /* 4단계 계좌 나누기 */
   .split { margin-top: 28px; border-radius: 18px; background: var(--bg); border: 1.5px solid var(--border); padding: 22px 20px; }
   .split-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -314,6 +363,13 @@
   footer a { color: var(--ink-mute); }
 
   @media (max-width: 768px) {
+    details.guide > summary { padding: 14px; gap: 10px; flex-wrap: wrap; }
+    .guide-sum-text { min-width: 0; flex-basis: calc(100% - 50px); }
+    details.guide .fold-btn { margin-left: 46px; }
+    .guide-body { padding: 0 12px 16px; }
+    .doc-step { padding: 14px 12px; }
+    .doc-grid { grid-template-columns: 1fr; }
+    .doc-for { margin-left: 0; width: 100%; }
     .tabs { gap: 5px; padding: 10px 0 9px; margin-bottom: 16px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
     .tab { font-size: 13px; padding: 9px 13px; flex: none; white-space: nowrap; }
@@ -391,17 +447,163 @@
       <div class="example-note" id="exampleNote"><span>예시 숫자가 미리 채워져 있습니다. <span class="legend-def">회색 숫자</span>는 예시(기본값), 내 숫자로 바꾼 칸은 <span class="legend-ed">진하게</span> 바뀌고 그 단계 탭에 ✓가 붙습니다.</span><button type="button" id="clearAll">모두 비우고 시작</button></div>
       <div class="grid-2">
         <div class="field"><label class="label" for="retire">퇴직금 (DC·IRP의 퇴직금 몫)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="retire" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="retire"></div><div class="input-hint">DB형이면 예상 퇴직금을 넣어 주세요.</div></div>
-        <div class="field"><label class="label" for="ps">연금저축 잔액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="ps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="ps"></div></div>
+        <div class="field"><label class="label" for="ps">연금저축 잔액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="ps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="ps"></div><div class="input-hint">증권사 앱의 평가금액 · <a href="#guideDocs" class="hint-link" data-open="guideDocs">조회 방법 ▾</a></div></div>
         <div class="field"><label class="label" for="irp">IRP 개인 납입분 잔액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="irp" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="irp"></div><div class="input-hint">퇴직금을 뺀, 내가 따로 넣은 돈과 그 수익.</div></div>
         <div class="field"><label class="label" for="isa">ISA 잔액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="isa" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="isa"></div></div>
         <div class="field"><label class="label" for="gen">일반계좌·예금 등 금융자산</label><div class="input-wrap"><input type="text" inputmode="numeric" id="gen" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="gen"></div></div>
-        <div class="field"><label class="label" for="nps">국민연금 예상 월액 (정상 수령 기준)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="nps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="nps"></div><div class="input-hint">'내 곁에 국민연금' 앱 → 예상연금액 조회</div></div>
+        <div class="field"><label class="label" for="nps">국민연금 예상 월액 (정상 수령 기준)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="nps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="nps"></div><div class="input-hint">'내 곁에 국민연금' 앱 → 예상연금액 조회 · <a href="#guideDocs" class="hint-link" data-open="guideDocs">조회 방법 ▾</a></div></div>
       </div>
       <details class="adv" open>
         <summary>더 정확하게 (몰라도 다음으로 넘어가도 됩니다)</summary>
         <div class="grid-2">
-          <div class="field"><label class="label" for="noded">연금저축·IRP 중 세액공제 받지 않은 원금</label><div class="input-wrap"><input type="text" inputmode="numeric" id="noded" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="noded"></div><div class="input-hint">비워두면 '전부 세액공제 받음'으로 계산합니다. 4단계 1,500만원 판정에 쓰입니다.</div></div>
+          <div class="field"><label class="label" for="noded">연금저축·IRP 중 세액공제 받지 않은 원금</label><div class="input-wrap"><input type="text" inputmode="numeric" id="noded" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="noded"></div><div class="input-hint">비워두면 '전부 세액공제 받음'으로 계산합니다. 4단계 1,500만원 판정에 쓰입니다. <a href="#guideDocs" class="hint-link" data-open="guideDocs">조회 방법 ▾</a></div></div>
           <div class="field"><label class="label" for="prop">재산세 과세표준 합계 (본인)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="prop" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="prop"></div><div class="input-hint">6단계 건보료 피부양자 판정에 쓰입니다. 공시가격이 아니라 과세표준입니다.</div></div>
+        </div>
+      </details>
+      <details class="guide" id="guideDocs">
+        <summary>
+          <span class="guide-ic">📄</span>
+          <span class="guide-sum-text"><b>서류로 정확하게 채우는 법</b><small>증권사 앱 1화면 + 홈택스 서류 2장 + 국민연금 앱 · 예시 포함</small></span>
+          <span class="fold-btn"><span class="open-txt">예시 보기 ▾</span><span class="close-txt">접기 ▴</span></span>
+        </summary>
+        <div class="guide-body">
+          <div class="guide-fast"><b>가장 빠른 방법</b> · 연금계좌가 있는 증권사·은행 고객센터에 <b>"과세제외금액, 이연퇴직소득, 총평가액이 각각 얼마인가요?"</b>라고 물어보세요. 금융회사는 세금을 떼기 위해 이 세 가지를 나눠 관리하고 있어요. 직접 확인하고 싶다면 아래 순서대로 하면 됩니다. 아래 예시 숫자는 이 페이지에 처음 채워져 있는 예시와 같습니다.</div>
+
+          <div class="doc-step">
+            <div class="doc-step-head"><span class="doc-no">화면 1</span><span class="doc-title">증권사·은행 앱의 연금계좌 잔고</span><span class="doc-for">연금저축 · IRP 잔액 칸</span></div>
+            <div class="doc-grid">
+              <div class="doc-how">
+                <div class="how-t">어디서 보나요?</div>
+                <ol>
+                  <li>연금저축·IRP 계좌마다 <b>총평가액(평가금액)</b>을 확인해요</li>
+                  <li>여러 금융회사에 흩어져 있다면 <b>금융감독원 통합연금포털</b>에서 한 번에 모아볼 수도 있어요</li>
+                </ol>
+                <div class="how-t">어떻게 넣나요?</div>
+                <div class="formula-box">
+                  <div>연금저축 잔액 칸 ← <b>연금저축 평가금액</b> 합계</div>
+                  <div>IRP 개인 납입분 칸 ← <b>IRP 평가금액 − 퇴직금</b></div>
+                  <small>IRP에 퇴직금이 들어 있으면 그 몫은 퇴직금 칸에 따로 넣어요. 퇴직금 몫은 아래 서류 2에서 확인합니다.</small>
+                </div>
+              </div>
+              <div class="doc-mock">
+                <div class="mock-stamp">예시 · 가상 수치</div>
+                <div class="mock-title">연금계좌 잔고</div>
+                <table class="mock-tbl">
+                  <tr class="hlg"><td><b>연금저축펀드 평가금액</b></td><td class="r"><b>130,000,000</b></td></tr>
+                  <tr class="hlg"><td><b>IRP 평가금액</b></td><td class="r"><b>250,000,000</b></td></tr>
+                  <tr><td>└ 그중 퇴직금 (서류 2)</td><td class="r">200,000,000</td></tr>
+                </table>
+                <div class="mock-arrow">연금저축 <b>1억 3,000만원</b> · IRP 개인 납입분 2억 5,000만 − 2억 = <b>5,000만원</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-step">
+            <div class="doc-step-head"><span class="doc-no">서류 2</span><span class="doc-title">퇴직소득 원천징수영수증</span><span class="doc-for">퇴직금 칸 · 4단계 근속연수</span></div>
+            <div class="doc-grid">
+              <div class="doc-how">
+                <div class="how-t">어디서 뽑나요?</div>
+                <ol>
+                  <li>홈택스 로그인 → <b>My홈택스 → 지급명세서 등 제출내역</b> (메뉴가 안 보이면 검색창에 '지급명세서')</li>
+                  <li>소득 종류 <b>퇴직소득</b>, 퇴직한 해(귀속연도) 선택 → 보기·인쇄</li>
+                  <li>회사가 아직 국세청에 제출하기 전이면 안 나와요. 이때는 <b>회사 인사·총무팀</b>에 요청하세요</li>
+                </ol>
+                <div class="how-t">무엇을 보나요?</div>
+                <p>퇴직금을 IRP로 옮겼다면 <b>'이연퇴직소득세액 계산'</b> 칸이 채워져 있어요.</p>
+                <div class="formula-box">
+                  <div>퇴직금 칸 ← <b>계좌입금금액</b></div>
+                  <div>4단계 근속연수 칸 ← <b>정산 근속연수</b></div>
+                  <small>아직 회사에 다니고 있다면 이 서류가 없어요. DB형은 회사 인사팀이나 퇴직연금 사업자 앱의 '예상 퇴직급여', DC형은 퇴직연금 계좌 평가금액을 넣으세요.</small>
+                </div>
+              </div>
+              <div class="doc-mock">
+                <div class="mock-stamp">예시 · 가상 수치</div>
+                <div class="mock-title">퇴직소득원천징수영수증</div>
+                <table class="mock-tbl">
+                  <tr><td>퇴직급여</td><td class="r">200,000,000</td></tr>
+                  <tr class="hl2"><td><b>정산 근속연수</b></td><td class="r"><b>25년</b></td></tr>
+                  <tr><td>신고대상세액</td><td class="r">5,075,000</td></tr>
+                </table>
+                <div class="mock-sub">이연퇴직소득세액 계산</div>
+                <table class="mock-tbl">
+                  <tr><th>계좌입금금액</th><th>퇴직급여</th><th>이연퇴직소득세</th></tr>
+                  <tr class="hl2"><td class="r"><b>200,000,000</b></td><td class="r">200,000,000</td><td class="r">5,075,000</td></tr>
+                </table>
+                <div class="mock-arrow">퇴직금 칸 <b>2억원</b> · 4단계 근속연수 <b>25년</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-step">
+            <div class="doc-step-head"><span class="doc-no">서류 3</span><span class="doc-title">연금보험료 등 소득·세액 공제확인서</span><span class="doc-for">세액공제 받지 않은 원금 칸</span></div>
+            <div class="doc-grid">
+              <div class="doc-how">
+                <div class="how-t">어디서 뽑나요?</div>
+                <ol>
+                  <li>홈택스(PC) 또는 손택스(앱) 로그인</li>
+                  <li>검색창에 <b>'연금보험료'</b> 입력 → <b>연금보험료 등 소득·세액 공제확인서</b> (국세증명 메뉴)</li>
+                  <li>신청하면 바로 열람·출력할 수 있어요</li>
+                </ol>
+                <div class="how-t">무엇을 보나요?</div>
+                <p>이 서류에는 <b>지금까지 세액공제를 받은 금액</b>이 연도별로 나옵니다. 맨 아래 <span class="mark">⑧ 공제금액 잔액</span>을 보세요.</p>
+                <div class="formula-box">
+                  <div><span class="gbn n1">1</span> 세액공제 받지 않은 원금</div>
+                  <div class="eq">= 내가 직접 넣은 원금 합계 − ⑧ 잔액</div>
+                  <small>'내가 직접 넣은 원금'은 증권사 앱의 연금계좌 <b>납입원금(입금 누계)</b>에서 퇴직금 이체분을 뺀 금액이에요.</small>
+                </div>
+              </div>
+              <div class="doc-mock">
+                <div class="mock-stamp">예시 · 가상 수치</div>
+                <div class="mock-title">연금보험료 등 소득·세액 공제확인서</div>
+                <table class="mock-tbl">
+                  <tr><th>과세연도</th><th>연금계좌 소득·세액 공제액<br>(세액공제 대상금액)</th></tr>
+                  <tr><td style="white-space:nowrap;">2014~2022</td><td class="r">… (93,000,000)</td></tr>
+                  <tr><td>2023</td><td class="r">1,080,000 (9,000,000)</td></tr>
+                  <tr><td>2024</td><td class="r">1,080,000 (9,000,000)</td></tr>
+                  <tr><td>2025</td><td class="r">1,080,000 (9,000,000)</td></tr>
+                  <tr><td><b>⑤ 합계액</b></td><td class="r"><b>120,000,000</b></td></tr>
+                </table>
+                <div class="mock-sub">2. 연금계좌 연금수령 개시 및 해지 명세</div>
+                <table class="mock-tbl">
+                  <tr><td>⑥ 공제금액 합계</td><td class="r">120,000,000</td></tr>
+                  <tr><td>⑦ 개시·해지된 계좌에서 공제받은 금액</td><td class="r">0</td></tr>
+                  <tr class="hl1"><td><b>⑧ 공제금액 잔액</b></td><td class="r"><b>120,000,000</b></td></tr>
+                </table>
+                <div class="mock-arrow">증권사 앱 납입원금 1억 5,000만 − ⑧ 1억 2,000만 = <b><span class="gbn n1">1</span> 3,000만원</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-step">
+            <div class="doc-step-head"><span class="doc-no">자료 4</span><span class="doc-title">국민연금 예상연금 조회</span><span class="doc-for">국민연금 예상 월액 칸</span></div>
+            <div class="doc-grid">
+              <div class="doc-how">
+                <div class="how-t">어디서 보나요?</div>
+                <ol>
+                  <li>국민연금공단 홈페이지 또는 <b>'내 곁에 국민연금'</b> 앱 → <b>내 연금 알아보기(예상연금 조회)</b></li>
+                  <li><b>예상 월 연금액</b>과 <b>받기 시작하는 나이</b>를 확인</li>
+                </ol>
+                <div class="how-t">어떻게 넣나요?</div>
+                <div class="formula-box">
+                  <div>국민연금 칸 ← <b>예상 월 연금액</b> (정상 수령 나이 기준)</div>
+                  <small>당겨 받기·미뤄 받기는 3단계에서 따로 계산하니, 여기에는 정상 나이에 받는 금액을 넣으세요. 이미 받고 있다면 지금 받는 월액을 넣으면 됩니다. 국민연금공단 고객센터(국번 없이 1355)에 물어봐도 알려 줍니다.</small>
+                </div>
+                <p style="margin-top:10px;">수급 개시 나이: 1961~64년생 63세, 1965~68년생 64세, <b>1969년생부터 65세</b></p>
+              </div>
+              <div class="doc-mock">
+                <div class="mock-stamp">예시 · 가상 수치</div>
+                <div class="mock-title">내 연금 알아보기</div>
+                <table class="mock-tbl">
+                  <tr class="hlg"><td><b>예상 노령연금 (월)</b></td><td class="r"><b>1,500,000</b></td></tr>
+                  <tr><td>수급 개시</td><td class="r">65세</td></tr>
+                  <tr><td>가입 기간</td><td class="r">1996.01 ~ 2025.12</td></tr>
+                </table>
+                <div class="mock-arrow">국민연금 칸에 <b>150만원</b> 입력</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-warn"><b>꼭 알아두세요</b> · 세액공제 받지 않은 원금(<span class="gbn n1">1</span>)은 금융회사가 따로 관리하고 있어야 세금 없이 인출돼요. 연금 개시 전에 금융회사에 확인하고, 필요하면 서류 3을 제출해 '과세제외금액'으로 등록해 두세요. 등록하지 않으면 세액공제 받은 원금(<span class="gbn n3">3</span>)으로 취급되어 연금소득세가 붙을 수 있습니다.</div>
         </div>
       </details>
 
@@ -532,6 +734,43 @@
         <div class="field"><label class="label" for="retYears">근속연수 (퇴직금 세금 계산용)</label><div class="input-wrap"><input type="number" id="retYears" min="1" max="50" placeholder="20"><span class="unit">년</span></div><div class="input-hint">비워두면 20년으로 계산합니다. 퇴직금이 없으면 무시됩니다.</div></div>
       </div>
       <label class="check-row"><input type="checkbox" id="oldAcct"> 2013년 3월 이전에 가입한 연금계좌가 있어요 (수령한도 계산이 6년차부터 시작)</label>
+      <details class="guide" id="guideAcct">
+        <summary>
+          <span class="guide-ic">📄</span>
+          <span class="guide-sum-text"><b>연금계좌 가입일은 어디서 보나요?</b><small>2013년 3월 이전 가입 체크 · 연금 받을 자격 나이 · 예시 포함</small></span>
+          <span class="fold-btn"><span class="open-txt">예시 보기 ▾</span><span class="close-txt">접기 ▴</span></span>
+        </summary>
+        <div class="guide-body">
+          <div class="doc-step">
+            <div class="doc-step-head"><span class="doc-no">자료 5</span><span class="doc-title">연금계좌 가입일</span><span class="doc-for">2013년 체크용</span></div>
+            <div class="doc-grid">
+              <div class="doc-how">
+                <div class="how-t">어디서 보나요?</div>
+                <ol>
+                  <li>증권사·은행 앱의 연금계좌 <b>계좌 정보(개설일)</b></li>
+                  <li>여러 곳이면 <b>금융감독원 통합연금포털</b>에서 한 번에</li>
+                </ol>
+                <div class="how-t">어떻게 정하나요?</div>
+                <div class="formula-box">
+                  <div>연금 받을 자격 = <b>55세</b>와 <b>가입 5년 된 해</b> 중 늦은 쪽</div>
+                  <div>퇴직금을 옮긴 IRP = 가입 기간 요건 없음</div>
+                  <small>수령한도는 계좌마다 따로 계산돼요. 이 가이드는 계좌를 하나로 합쳐서 보니, <b>돈이 가장 많이 든 계좌</b> 기준으로 판단하세요. 2013년 3월 1일 이전 가입 체크도 그 계좌가 해당될 때만 하세요.</small>
+                </div>
+              </div>
+              <div class="doc-mock">
+                <div class="mock-stamp">예시 · 가상 수치</div>
+                <div class="mock-title">내 연금계좌</div>
+                <table class="mock-tbl">
+                  <tr><th>계좌</th><th>개설일</th><th>평가금액</th></tr>
+                  <tr><td>연금저축펀드</td><td class="r">2014.03.10</td><td class="r">130,000,000</td></tr>
+                  <tr class="hlg"><td><b>IRP (퇴직금 이체)</b></td><td class="r"><b>2025.03.02</b></td><td class="r"><b>250,000,000</b></td></tr>
+                </table>
+                <div class="mock-arrow">가장 큰 IRP가 2025년 개설 → 2013년 이전 계좌 <b>없음</b> (체크하지 않음)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
       <div class="result" id="r4"></div>
       <details class="more"><summary>자세히 알아보기 · 연금수령한도와 세금 줄이는 원칙</summary><div class="more-body">
 <h4>'연금수령'으로 인정받는 조건</h4>
@@ -1342,6 +1581,12 @@ $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab
 
 $('resetBtn').addEventListener('click', () => { if (!confirm('입력한 내용을 지우고 예시 숫자로 처음부터 다시 시작할까요?')) return; applyExample(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 $('clearAll').addEventListener('click', () => { S = { v: {}, base: {}, example: false, tab: '1' }; save(); clearFields(); renderAll(); $('retire').focus(); });
+
+document.querySelectorAll('[data-open]').forEach(a => a.addEventListener('click', e => {
+  const d = $(a.dataset.open); if (!d) return;
+  e.preventDefault(); d.open = true;
+  window.scrollTo({ top: d.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+}));
 
 let rzT = null, rzN = window.innerWidth < 600;
 window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => { const n = window.innerWidth < 600; if (n !== rzN) { rzN = n; renderAll(); } }, 200); });
