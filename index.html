@@ -211,9 +211,9 @@
   .donut-center .v span { display: block; white-space: nowrap; }
   .donut-center .l { font-size: 11px; font-weight: 700; color: var(--ink-mute); }
   .legend { display: flex; flex-direction: column; gap: 8px; }
-  .legend-item { display: grid; grid-template-columns: 12px 1fr auto 62px; column-gap: 12px; row-gap: 7px; align-items: center; padding: 11px 14px 10px; background: var(--bg); border-radius: 12px; }
+  .legend-item { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto 62px; column-gap: 12px; row-gap: 7px; align-items: center; padding: 11px 14px 10px; background: var(--bg); border-radius: 12px; }
   .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
-  .legend-item .nm { font-size: 14.5px; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
+  .legend-item .nm { font-size: 14.5px; font-weight: 800; color: var(--ink-soft); line-height: 1.4; word-break: keep-all; }
   .legend-item .amt { font-size: 16px; font-weight: 900; color: var(--ink); white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
   .legend-item .pc { font-size: 13px; font-weight: 900; text-align: center; border-radius: 999px; padding: 3px 0; font-variant-numeric: tabular-nums; }
   .legend-item .bar { grid-column: 2 / -1; height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
@@ -231,6 +231,37 @@
   .hbar-fill { height: 100%; }
   .hbar-row .amt { text-align: right; white-space: nowrap; }
 
+  /* 4단계 통장 나누기 */
+  .split { margin-top: 28px; border-radius: 18px; background: var(--bg); border: 1.5px solid var(--border); padding: 22px 20px; }
+  .split-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .split-badge { background: var(--accent); color: var(--white); font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 999px; }
+  .split-title { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; }
+  .split-lead { font-size: 14.5px; color: var(--ink-soft); font-weight: 600; margin-top: 8px; line-height: 1.65; }
+  .acct-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+  .acct { background: var(--white); border: 1.5px solid var(--border); border-top: 6px solid var(--c); border-radius: 14px; padding: 16px 16px 14px; display: flex; flex-direction: column; min-width: 0; }
+  .acct-k { display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 900; color: var(--ink-soft); }
+  .acct-k .bn { width: 20px; height: 20px; border-radius: 6px; background: var(--c); color: var(--tc); font-size: 12px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .acct-where { font-size: 12px; font-weight: 700; color: var(--ink-mute); margin-top: 2px; }
+  .acct-bal { font-size: 22px; font-weight: 900; letter-spacing: -0.6px; margin-top: 8px; }
+  .acct ul { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .acct li { font-size: 13px; font-weight: 700; color: var(--ink-soft); line-height: 1.5; padding-left: 14px; position: relative; }
+  .acct li:before { content: ''; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
+  .acct li.cau { color: var(--ink-mute); font-weight: 600; }
+  .acct-take { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12.5px; font-weight: 800; color: var(--ink-mute); }
+  .acct-take b { font-size: 17px; font-weight: 900; color: var(--ink); white-space: nowrap; }
+  table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 18px; font-size: 14px; background: var(--white); border-radius: 12px; overflow: hidden; border: 1.5px solid var(--border); }
+  table.cmp { table-layout: fixed; }
+  table.cmp th, table.cmp td { padding: 11px 12px; text-align: right; font-weight: 700; border-bottom: 1px solid var(--border); word-break: keep-all; line-height: 1.4; }
+  table.cmp th:first-child, table.cmp td:first-child { width: 34%; }
+  table.cmp small { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink-mute); }
+  table.cmp th { background: var(--bg-alt); font-size: 12.5px; font-weight: 900; color: var(--ink-soft); }
+  table.cmp th.win { background: var(--dark-warm); color: var(--white); }
+  table.cmp td:first-child, table.cmp th:first-child { text-align: left; color: var(--ink-soft); }
+  table.cmp td.win { color: var(--ink); font-weight: 900; background: #FFF6EE; }
+  table.cmp tr:last-child td { border-bottom: none; }
+  .how { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .how > div { background: var(--white); border-radius: 12px; padding: 13px 15px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); line-height: 1.6; border: 1px solid var(--border); }
+  .how b.h { display: block; font-size: 13px; font-weight: 900; color: var(--accent); margin-bottom: 3px; }
   table.mini { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
   table.mini th { background: var(--bg-alt); font-weight: 800; color: var(--ink-soft); padding: 10px 8px; text-align: right; }
   table.mini th:first-child, table.mini td:first-child { text-align: left; }
@@ -300,6 +331,9 @@
     .diag { padding: 20px 18px; }
     .diag-v { font-size: 21px; }
     .donut-row { grid-template-columns: 1fr; justify-items: center; }
+    .acct-grid, .how { grid-template-columns: 1fr; }
+    .split { padding: 18px 14px; }
+    table.cmp th, table.cmp td { padding: 10px 8px; font-size: 13px; }
     .legend { width: 100%; }
     .p-label { font-size: 10.5px; }
     .hbar-row { grid-template-columns: 88px 1fr 84px; font-size: 13px; }
@@ -487,8 +521,8 @@
     <div class="step-head">
       <div>
         <div class="step-label"><div class="step-line"></div><span class="step-text">STEP 04</span></div>
-        <h2 class="step-title">연금 인출 순서와 연 1,500만원 선</h2>
-        <p class="step-q">연금계좌에서 1년에 얼마까지 꺼내야 세금이 3~5%대로 끝날까요?</p>
+        <h2 class="step-title">연금계좌 통장 나누기와 연 1,500만원 선</h2>
+        <p class="step-q">같은 돈을 꺼내도 어느 통장에서 꺼내느냐에 따라 세금이 달라집니다.</p>
       </div>
     </div>
     <div class="step-body">
@@ -514,7 +548,7 @@
 <li><b>연금소득세율은 나이에 따라 내려갑니다.</b> 55~69세 5.5%, 70~79세 4.4%, 80세 이상 3.3%(지방세 포함).</li></ol>
 <h4>연금 개시 전에 할 일</h4>
 <ul><li>세액공제 안 받은 돈이 금융회사에 '과세제외금액'으로 등록됐는지 확인하기</li>
-<li>연금저축과 IRP를 어느 계좌부터, 얼마씩 받을지 정하기 — 계좌를 나눠 받으면 1,500만원 선을 지키기 쉽습니다</li></ul>
+<li>통장별(① 세액공제 안 받은 돈 · ② 퇴직금 IRP · ③ 세액공제 받은 돈) 잔액을 금융회사에서 확인하고, 해마다 어느 통장에서 얼마씩 받을지 정하기</li></ul>
 </div></details>
       <div class="step-actions">
         <a class="btn-out" id="link4" href="https://ttokjaetv.github.io/pension-tax-sim/" target="_blank" rel="noopener">연금 인출 세금 시뮬레이터로 여러 해 계산 ↗</a>
@@ -902,6 +936,76 @@ function render3(m) {
   $('link3').href = 'https://ttokjaetv.github.io/retirement/?' + q3.toString();
 }
 
+/* 연금계좌 통장 나누기: ①세액공제 안 받은 돈 / ②퇴직금 IRP / ③세액공제 받은 돈을 통장별로 두고
+   매년 ③에서 1,500만원까지, 부족분은 ①→②에서 보충 (연금 인출 세금 시뮬레이터 split 모드와 같은 엔진) */
+function splitSim(m) {
+  if (m.engineMissing || m.wAge < 55 || m.pensionTotal <= 0 || m.wAmt <= 0) return null;
+  try {
+    const W = 10000;
+    const base = {
+      startAge: m.wAge, eligAge: m.eligAge, pre2013: $('oldAcct').checked,
+      b1: m.noded * W, b2: m.retire * W, retTaxNat: retirementTax(m.retire * W, m.retYears), b3: Math.max(0, m.ps + m.irp - m.noded) * W,
+      r: m.rr / 100, years: 1, phase1Amount: 0, publicPension: m.npsSel * 12 * W, publicStartAge: m.npsStart, otherIncome: 0, maxAge: 100,
+    };
+    const one = simulate({ ...base, mode: 'amount', amount: m.wAmt * W, desired: 0, capAmount: 0 });
+    const sp = simulate({ ...base, mode: 'split', amount: 0, desired: m.wAmt * W, capAmount: 1500 * W });
+    const keep = res => { let k = 0; for (const r of res.rows) { if (r.w >= m.wAmt * W - 5000) k++; else break; } return k; };
+    const pack = res => ({ keep: keep(res), high: res.sum.highYears, tax: res.sum.tax / W, eff: res.sum.effRate * 100, got: res.sum.withdrawn / W });
+    const r0 = sp.rows[0];
+    return { one: pack(one), sp: pack(sp), first: r0 ? { a: r0.from1 / W, b: r0.from2 / W, c: r0.from3 / W } : { a: 0, b: 0, c: 0 } };
+  } catch (e) { return null; }
+}
+function splitBlock(m) {
+  const A = m.noded, B = m.retire, C = Math.max(0, m.ps + m.irp - m.noded);
+  const sim = splitSim(m);
+  const f = sim ? sim.first : (() => { const c = Math.min(C, 1500, m.wAmt); const a = Math.min(A, m.wAmt - c); return { a, b: Math.min(B, m.wAmt - c - a), c }; })();
+  const rate = ageRate(m.wAge);
+  const acct = (no, name, where, bal, c, tc, items, take, takeNote) => `
+    <div class="acct" style="--c:${c};--tc:${tc}">
+      <div class="acct-k"><span class="bn">${no}</span>${name}</div>
+      <div class="acct-where">${where}</div>
+      <div class="acct-bal">${fmtMan(bal)}</div>
+      <ul>${items.map(t => t.startsWith('※') ? `<li class="cau">${t.slice(1).trim()}</li>` : `<li>${t}</li>`).join('')}</ul>
+      <div class="acct-take"><span>첫해 인출${takeNote ? ` · ${takeNote}` : ''}</span><b>${fmtMan(take)}</b></div>
+    </div>`;
+  const cards = `<div class="acct-grid">
+    ${acct(3, '세액공제 받은 돈', '연금저축·IRP · 세액공제분 + 운용수익', C, '#D9542B', '#FFFFFF',
+      [`1년에 <b>1,500만원까지</b>만 꺼내 ${rate}%로 끝내기`, '나이 들수록 5.5 → 4.4 → 3.3%', '※ 1,500만원을 넘으면 그해 전액이 종합과세 또는 16.5%'], f.c, '')}
+    ${acct(1, '세액공제 안 받은 돈', '별도 연금저축 통장 · 세액공제 한도 넘겨 넣은 원금', A, '#C4A57B', '#3A2F26',
+      ['꺼낼 때 <b>세금 0원</b>', '1,500만원 계산에서 빠짐', '연금저축이면 필요할 때 일부 인출 가능', '※ 이 통장에서 생긴 수익은 ③처럼 과세'], f.a, f.a > 0 ? '부족분 보충' : '')}
+    ${acct(2, '퇴직금', '퇴직금을 받은 IRP', B, '#8B6F47', '#FFFFFF',
+      ['퇴직소득세 <b>30% 감면</b> (11년차부터 40%, 21년차부터 50%)', '1,500만원 계산에서 빠짐', '※ 감면 연차는 실제로 받은 해만 셈 → 소액이라도 일찍 개시'], f.b, f.b > 0 ? '나머지 보충' : '①로 충분')}
+  </div>`;
+  let cmp = '';
+  if (A + B <= 0) {
+    cmp = `<div class="verdict warn">①·② 통장이 비어 있어 지금은 나눠도 차이가 없습니다. 1단계 '더 정확하게'에 세액공제 안 받은 납입액이 있으면 넣어 보세요. 아직 넣는 중이라면 세액공제 한도(연금저축 600만원, IRP 합산 900만원)를 넘기는 돈부터 별도 통장으로 모으면 됩니다.</div>`;
+  } else if (sim) {
+    const o = sim.one, p = sim.sp, d = o.tax - p.tax;
+    const yrs = k => k >= 100 - m.wAge + 1 ? `${100 - m.wAge + 1}년<small>100세까지</small>` : `${k}년<small>${m.wAge}~${m.wAge + k - 1}세</small>`;
+    cmp = `
+    <table class="cmp"><thead><tr><th>매년 ${fmtMan(m.wAmt)}씩<br>꺼낼 때</th><th>한 통장에<br>섞어 두면</th><th class="win">통장을<br>나눠 두면</th></tr></thead><tbody>
+      <tr><td>1,500만원 넘는 해</td><td>${o.high}년</td><td class="win">${p.high}년</td></tr>
+      <tr><td>평생 세금 합계</td><td>${fmtMan(o.tax)}</td><td class="win">${fmtMan(p.tax)}</td></tr>
+      <tr><td>실효세율</td><td>${pct(o.eff)}</td><td class="win">${pct(p.eff)}</td></tr>
+      <tr><td>${fmtMan(m.wAmt)} 유지 기간</td><td>${yrs(o.keep)}</td><td class="win">${yrs(p.keep)}</td></tr>
+    </tbody></table>
+    ${d > 0.5
+      ? `<div class="verdict ok">통장만 나눠도 평생 세금이 약 <b>${fmtMan(d)}</b> 줄고, 실효세율은 ${pct(o.eff)} → <b>${pct(p.eff)}</b>입니다. 한 통장이면 앞에서 ①·②를 다 쓰고 나중에 ③이 한꺼번에 나와 1,500만원을 넘기기 쉽기 때문입니다.${p.keep < o.keep ? ` 대신 ${fmtMan(m.wAmt)}을 유지하는 기간은 ${o.keep - p.keep}년 짧아지니, 그 뒤에는 ③에서 1,500만원을 넘겨 받을지 정하면 됩니다.` : ''}</div>`
+      : `<div class="verdict">지금 숫자에서는 나눠도 세금 차이가 거의 없습니다. 꺼내는 금액이 커지거나 ③이 커질수록 통장 나누기 효과가 커집니다.</div>`}`;
+  }
+  return `<div class="split">
+    <div class="split-head"><span class="split-badge">핵심 전략</span><span class="split-title">연금계좌 통장 나누기</span></div>
+    <p class="split-lead">한 계좌 안에서는 꺼내는 순서를 내가 고를 수 없습니다(① → ② → ③ 고정). 돈을 성격별로 <b>통장 3개</b>에 나눠 두면, 매년 <b>③에서 1,500만원까지</b> 꽉 채우고 모자란 만큼만 <b>①·②에서 보충</b>하는 식으로 통장마다 꺼낼 금액을 정할 수 있습니다.</p>
+    ${cards}
+    ${cmp}
+    <div class="how">
+      <div><b class="h">아직 넣는 중이라면</b>세액공제 한도(연금저축 600만원, IRP 합산 900만원)를 넘겨 넣을 돈은 <b>별도 연금저축 통장</b>에, 퇴직금은 <b>새 IRP</b>로 받으세요.</div>
+      <div><b class="h">이미 한 통장에 섞여 있다면</b>개시 전에 연금저축에서 ① 금액만큼만 빼면 세금이 없습니다(금융회사에 '과세제외금액'으로 등록돼 있어야 함). 이 돈은 예금·ISA에 두고 보충용으로 쓰세요. IRP는 법정 사유가 있어야 일부 인출이 됩니다.</div>
+    </div>
+    <p class="note">통장 나누기 표는 수익률 ${m.rr}%(점검표 탭 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 계좌를 하나로 합쳐 본 근사치라 실제 수령한도·감면 연차는 통장마다 따로 계산됩니다.</p>
+  </div>`;
+}
+
 function render4(m) {
   $('wAmt').placeholder = comma(m.wDefault); $('wAge').placeholder = Math.max(55, m.retireAge);
   $('wAmtHint').textContent = `비워두면 ${m.wAge < m.npsStart ? '공백기 생활비 전액' : '생활비에서 국민연금을 뺀 금액'} ${fmtMan(m.wDefault)}으로 계산합니다.`;
@@ -929,17 +1033,18 @@ function render4(m) {
       ${stat('첫해 연금수령한도', lim, isFinite(m.limit) ? `평가액 ÷ (11 − ${m.year1}) × 120%` : '11년차 이후', true)}
       ${stat('1,500만원 판정 대상', fmtMan(m.wcIn), m.wcOut > 0 ? `한도 초과 ${fmtMan(m.wcOut)}은 기타소득세 16.5%` : '세액공제분 + 운용수익 인출')}
     </div>
-    <div style="margin-top:20px"><span class="label">첫해 ${fmtMan(m.wAmt)}은 이 순서로 빠집니다</span>
+    <div style="margin-top:20px"><span class="label">한 통장에 섞여 있으면, 첫해 ${fmtMan(m.wAmt)}은 ① → ② → ③ 순서로만 빠집니다</span>
       <div class="hbar-track" style="height:28px;margin-top:6px">${seg(m.wa, '#C4A57B', '세액공제 안 받은 원금')}${seg(m.wb, '#8B6F47', '퇴직금')}${seg(m.wc, '#D9542B', '세액공제분·수익')}${seg(m.wOver, '#C4B8A3', '잔액 초과')}</div>
-      <div class="legend" style="margin-top:12px">
-        <div class="legend-item"><span class="legend-dot" style="background:#C4A57B"></span><span>① 세액공제 안 받은 원금 · 세금 없음</span><span class="amt">${fmtMan(m.wa)}</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#8B6F47"></span><span>② 퇴직금 · 퇴직소득세 30% 감면, 1,500만원 판정 제외</span><span class="amt">${fmtMan(m.wb)}</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#D9542B"></span><span>③ 세액공제분·수익 · 연금소득세 대상</span><span class="amt">${fmtMan(m.wc)}</span></div>
-      </div>
+      <div class="legend" style="margin-top:12px">${[
+        ['① 세액공제 안 받은 원금', '세금 없음', m.wa, '#C4A57B', '#3A2F26'],
+        ['② 퇴직금', '퇴직소득세 30% 감면', m.wb, '#8B6F47', '#FFFFFF'],
+        ['③ 세액공제분·수익', '연금소득세 대상', m.wc, '#D9542B', '#FFFFFF']
+      ].map(([n, d, v, c, tc]) => { const r = v / tot * 100; return `<div class="legend-item${v > 0 ? '' : ' zero'}"><span class="legend-dot" style="background:${c}"></span><span class="nm">${n} <span style="font-weight:600;color:var(--ink-mute);font-size:12.5px">· ${d}</span></span><span class="amt">${fmtMan(v)}</span><span class="pc" style="background:${c};color:${tc}">${pct(r)}</span><span class="bar"><i style="width:${r}%;background:${c}"></i></span></div>`; }).join('')}</div>
     </div>
     ${verdicts}
     ${taxBlock}
-    <p class="note">첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로, 다른 종합소득은 없는 것으로 가정했습니다. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}퇴직금 감면은 11~20년차 40%, 20년 초과 50%로 커집니다. 연 1,500만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 여러 해, 계좌를 나눠 받는 경우는 시뮬레이터에서 확인하세요.</p>`;
+    ${splitBlock(m)}
+    <p class="note">첫해 표는 첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로, 다른 종합소득은 없는 것으로 가정했습니다. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}퇴직금 감면은 11~20년차 40%, 20년 초과 50%로 커집니다. 연 1,500만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 계좌마다 다른 수령한도·감면 연차까지 여러 해로 자세히 보려면 시뮬레이터에서 확인하세요.</p>`;
   const q4 = new URLSearchParams({ from: 'guide' });
   if (['retire', 'ps', 'irp', 'noded'].some(has)) {          // 연금계좌 금액을 하나라도 넣었으면 세 바구니를 함께 넘김
     q4.set('b1', Math.round(m.noded)); q4.set('b2', Math.round(m.retire)); q4.set('b3', Math.round(Math.max(0, m.ps + m.irp - m.noded)));
