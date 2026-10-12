@@ -203,11 +203,12 @@
   .note b { color: var(--ink-soft); }
 
   /* 도넛 */
-  .donut-row { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; margin-top: 16px; }
-  .donut { width: 180px; height: 180px; border-radius: 50%; position: relative; background: var(--border); }
-  .donut:after { content: ""; position: absolute; inset: 38px; background: var(--white); border-radius: 50%; }
-  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
-  .donut-center .v { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
+  .donut-row { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: center; margin-top: 16px; }
+  .donut { width: 200px; height: 200px; border-radius: 50%; position: relative; background: var(--border); }
+  .donut:after { content: ""; position: absolute; inset: 34px; background: var(--white); border-radius: 50%; }
+  .donut-center { position: absolute; inset: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-align: center; }
+  .donut-center .v { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.25; margin-top: 2px; }
+  .donut-center .v span { display: block; white-space: nowrap; }
   .donut-center .l { font-size: 11px; font-weight: 700; color: var(--ink-mute); }
   .legend { display: flex; flex-direction: column; gap: 8px; }
   .legend-item { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; font-size: 14px; font-weight: 700; }
@@ -357,7 +358,7 @@
         <div class="field"><label class="label" for="gen">일반계좌·예금 등 금융자산</label><div class="input-wrap"><input type="text" inputmode="numeric" id="gen" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="gen"></div></div>
         <div class="field"><label class="label" for="nps">국민연금 예상 월액 (정상 수령 기준)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="nps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="nps"></div><div class="input-hint">'내 곁에 국민연금' 앱 → 예상연금액 조회</div></div>
       </div>
-      <details class="adv">
+      <details class="adv" open>
         <summary>더 정확하게 (몰라도 다음으로 넘어가도 됩니다)</summary>
         <div class="grid-2">
           <div class="field"><label class="label" for="noded">연금저축·IRP 중 세액공제 안 받은 납입액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="noded" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="noded"></div><div class="input-hint">비워두면 '전부 세액공제 받음'으로 계산합니다. 4단계 1,500만원 판정에 쓰입니다.</div></div>
@@ -805,7 +806,7 @@ function render1(m) {
   const pRatio = m.total ? m.pensionTotal / m.total * 100 : 0;
   $('r1').innerHTML = `
     <div class="donut-row">
-      <div class="donut" style="background:${bg}"><div class="donut-center"><div class="l">총 금융자산</div><div class="v">${fmtMan(m.total)}</div></div></div>
+      <div class="donut" style="background:${bg}"><div class="donut-center"><div class="l">총 금융자산</div><div class="v">${fmtMan(m.total).split(' ').map(t => `<span>${t}</span>`).join('')}</div></div></div>
       <div class="legend">${parts.map(p => `<div class="legend-item"><span class="legend-dot" style="background:${p[2]}"></span><span>${p[0]}</span><span class="amt">${fmtMan(p[1])}${m.total ? ' · ' + pct(p[1] / m.total * 100) : ''}</span></div>`).join('')}</div>
     </div>
     <div class="stat-grid" style="margin-top:18px">
