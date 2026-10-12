@@ -448,7 +448,7 @@
       </div>
     </div>
     <div class="step-body">
-      <div class="example-note" id="exampleNote"><span>예시 숫자가 미리 채워져 있습니다. <span class="legend-def">회색 숫자</span>는 예시(기본값), 내 숫자로 바꾼 칸은 <span class="legend-ed">진하게</span> 바뀌고 그 단계 탭에 ✓가 붙습니다.</span><button type="button" id="clearAll">모두 비우고 시작</button></div>
+      <div class="example-note" id="exampleNote"><span>예시 숫자가 미리 채워져 있습니다. <span class="legend-def">회색 숫자</span>는 예시(기본값), 내 숫자로 바꾼 칸은 <span class="legend-ed">진하게</span> 바뀝니다. 숫자를 바꾸거나 [다음] 버튼으로 확인하고 넘어간 단계는 탭에 ✓가 붙습니다.</span><button type="button" id="clearAll">모두 비우고 시작</button></div>
       <div class="grid-2">
         <div class="field"><label class="label" for="retire">퇴직금 (DC·IRP의 퇴직금 몫)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="retire" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="retire"></div><div class="input-hint">DB형이면 예상 퇴직금을 넣어 주세요.</div></div>
         <div class="field"><label class="label" for="ps">연금저축 잔액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="ps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="ps"></div><div class="input-hint">증권사 앱의 평가금액 · <a href="#guideDocs" class="hint-link" data-open="guideDocs">조회 방법 ▾</a></div></div>
@@ -947,7 +947,7 @@ const pct = v => (Math.round(v * 10) / 10).toLocaleString('ko-KR') + '%';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ===== 저장 ===== */
-let S = { v: {}, base: {}, example: false, tab: '1' };
+let S = { v: {}, base: {}, ok: [], example: false, tab: '1' };
 function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -959,7 +959,7 @@ function load() {
           base = o.example ? { ...o.v } : exampleValues();
           if (!o.example && o.v.isaDate) base.isaDate = o.v.isaDate;
         }
-        S = { v: o.v, base, example: !!o.example, tab: o.tab || '1' };
+        S = { v: o.v, base, ok: Array.isArray(o.ok) ? o.ok : [], example: !!o.example, tab: o.tab || '1' };
         return true;
       }
     }
@@ -1511,10 +1511,10 @@ function renderTabs() {
   document.querySelectorAll('.tab').forEach(b => {
     const k = b.dataset.tab, on = k === S.tab;
     b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
-    const ed = k !== 'sum' && stepEdited(k);
-    b.classList.toggle('done', ed);
-    if (k !== 'sum') b.querySelector('.tab-n').textContent = ed && !on ? '✓' : k;
-    b.title = ed ? '기본값에서 바꾼 칸이 있습니다' : '';
+    const ed = k !== 'sum' && stepEdited(k), ok = k !== 'sum' && S.ok.includes(k), done = ed || ok;
+    b.classList.toggle('done', done);
+    if (k !== 'sum') b.querySelector('.tab-n').textContent = done && !on ? '✓' : k;
+    b.title = ed ? '기본값에서 바꾼 칸이 있습니다' : ok ? '확인하고 넘어간 단계입니다' : '';
   });
   document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('on', p.dataset.pane === S.tab));
   const bar = $('tabs'), act = bar.querySelector('.tab.on');   // 휴대폰: 고른 탭이 가로 스크롤 안에 보이게
@@ -1579,7 +1579,7 @@ function exampleValues() {
     birth: '1971', retireAge: '60', living: '298', shift: '0', wAge: '60', retYears: '25', isaDate: iso, fin: '600', spNps: '50', rr: '4', inf: '2.5', endAge: '95', save: '50' };
 }
 function clearFields() { FIELDS.forEach(id => { const el = $(id); if (!el) return; if (el.type === 'checkbox') el.checked = false; else if (el.type === 'range') el.value = 0; else el.value = ''; }); }
-function applyExample() { const ex = exampleValues(); S = { v: { ...ex }, base: { ...ex }, example: true, tab: '1' }; save(); clearFields(); restore(); }
+function applyExample() { const ex = exampleValues(); S = { v: { ...ex }, base: { ...ex }, ok: [], example: true, tab: '1' }; save(); clearFields(); restore(); }
 
 document.querySelectorAll('input[data-money]').forEach(el => {
   el.addEventListener('input', () => {
@@ -1594,12 +1594,13 @@ document.querySelectorAll('#rateSeg button').forEach(b => b.addEventListener('cl
 
 document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => {
   const k = +b.dataset.next;
+  if (!S.ok.includes(String(k))) { S.ok.push(String(k)); save(); }
   showTab(k < 6 ? k + 1 : 'sum', true);
 }));
 $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab, true); });
 
 $('resetBtn').addEventListener('click', () => { if (!confirm('입력한 내용을 지우고 예시 숫자로 처음부터 다시 시작할까요?')) return; applyExample(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-$('clearAll').addEventListener('click', () => { S = { v: {}, base: {}, example: false, tab: '1' }; save(); clearFields(); renderAll(); $('retire').focus(); });
+$('clearAll').addEventListener('click', () => { S = { v: {}, base: {}, ok: [], example: false, tab: '1' }; save(); clearFields(); renderAll(); $('retire').focus(); });
 
 document.querySelectorAll('[data-open]').forEach(a => a.addEventListener('click', e => {
   const d = $(a.dataset.open); if (!d) return;
