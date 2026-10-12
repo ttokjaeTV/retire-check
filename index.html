@@ -102,7 +102,12 @@
   .pf-total em { font-style: normal; font-size: 12px; font-weight: 700; color: #D9C9BA; }
   .pf-total.warn { background: #F6E9CF; color: #7A5410; font-size: 13px; font-weight: 800; }
   .pf-sumwarn { font-size: 12px; font-weight: 700; color: #7A5410; margin-top: 6px; }
-  .pf-box { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .pf-box { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; }
+  .pf-box .pf { flex: 1; display: flex; flex-direction: column; }
+  .pf-box .pf-pfonly { flex: 1; display: flex; flex-direction: column; }
+  .pf-box .pf-tot { margin-top: auto; padding-top: 10px; }
+  .pf-quick { flex-wrap: nowrap; }
+  .pf-quick .chip { white-space: nowrap; }
   .assume-t { font-size: 13px; font-weight: 800; color: var(--ink-soft); margin-bottom: 10px; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .diag { background: var(--dark-warm); color: var(--white); border-radius: 18px; padding: 24px; margin-bottom: 14px; }
@@ -432,6 +437,7 @@
     .donut-row { grid-template-columns: 1fr; justify-items: center; }
     .acct-grid, .how { grid-template-columns: 1fr; }
     .pf-row { grid-template-columns: minmax(0, 1fr) 80px 28px; row-gap: 6px; }
+    .pf-quick { flex-wrap: wrap; }
     .pf-nm { grid-column: 1 / -1; }
     .pf-tr::before { content: '총수익률 '; font-size: 12px; font-weight: 700; color: var(--ink-mute); }
     .split { padding: 18px 14px; }
@@ -1223,12 +1229,12 @@ const PF = (() => {
   // 빠른 시작 예시 조합 (종목 추천이 아니라 출발점 · 비중은 바꿀 수 있음)
   const QUICK = {
     Pre: [
-      ['미국 지수 성장형', [['US:VOO', 50], ['US:QQQ', 50]]],
+      ['성장형', [['US:VOO', 40], ['US:QQQ', 40], ['KR:489250', 20]]],
       ['배당성장형', [['KR:489250', 100]]],
       ['지수 + 배당성장', [['US:VOO', 50], ['KR:489250', 50]]],
     ],
     Post: [
-      ['인컴형 (배당 + 커버드콜)', [['KR:489250', 50], ['KR:441640', 30], ['KR:161510', 20]]],
+      ['인컴형', [['KR:489250', 50], ['KR:441640', 30], ['KR:161510', 20]]],
       ['커버드콜 중심', [['KR:441640', 50], ['KR:458760', 50]]],
       ['배당성장 유지', [['KR:489250', 100]]],
     ],
