@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<script src="https://ttokjaetv.github.io/member-lock.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>은퇴 5년 전 점검 가이드 · 똑재TV</title>
 <meta name="description" content="은퇴 5년 전, 소득 공백기·국민연금 수령 시기·연금 인출 순서·연 1,500만원·ISA 만기·건보료 피부양자까지 6단계로 숫자 점검">
@@ -664,7 +665,7 @@
         <div class="assume-t">앞으로의 운용 가정 — 은퇴 전후로 계속 투자한다고 보고, 3·4단계와 점검표가 모두 이 숫자로 계산됩니다</div>
         <div class="grid-2">
           <div class="field pf-box">
-            <div class="pf-head"><span class="label" style="margin:0">은퇴 전 포트폴리오</span><div class="seg pf-modeseg"><button type="button" data-pfmode="pf">종목으로 정하기</button><button type="button" data-pfmode="man">직접 입력</button></div></div>
+            <div class="pf-head"><span class="label" style="margin:0">은퇴 전 포트폴리오</span><div class="seg pf-modeseg"><button type="button" data-pfmode="pf" data-member-click="종목으로 포트폴리오 정하기">종목으로 정하기</button><button type="button" data-pfmode="man">직접 입력</button></div></div>
             <div class="pf-lead">모으는 시기 — 수익률을 높이는 구성</div>
             <div class="pf" id="pfPre">
               <div class="pf-pfonly">
@@ -677,7 +678,7 @@
             </div>
           </div>
           <div class="field pf-box">
-            <div class="pf-head"><span class="label" style="margin:0">은퇴 후 포트폴리오</span><div class="seg pf-modeseg"><button type="button" data-pfmode="pf">종목으로 정하기</button><button type="button" data-pfmode="man">직접 입력</button></div></div>
+            <div class="pf-head"><span class="label" style="margin:0">은퇴 후 포트폴리오</span><div class="seg pf-modeseg"><button type="button" data-pfmode="pf" data-member-click="종목으로 포트폴리오 정하기">종목으로 정하기</button><button type="button" data-pfmode="man">직접 입력</button></div></div>
             <div class="pf-lead">꺼내 쓰는 시기 — 고배당·커버드콜로 현금 흐름을 만드는 구성</div>
             <div class="pf" id="pfPost">
               <div class="pf-pfonly">
@@ -701,7 +702,7 @@
 
       <div class="result" id="r1"></div>
 
-      <div class="wi" id="wiBox">
+      <div class="wi" id="wiBox" data-member="부자지수">
         <div class="wi-head"><span class="wi-title">부자지수로 보는 내 출발점</span><span class="wi-ref">참고용</span></div>
         <p class="wi-desc">내 나이·소득이면 이 정도는 모았어야 한다는 기준과 비교합니다. 100%가 기준선입니다.</p>
         <div class="grid-2">
@@ -986,7 +987,7 @@
         <span class="note" style="margin:0">숫자를 바꾸고 싶으면 위 단계로 돌아가 고치면 바로 반영됩니다.</span>
         <span class="act-btns">
           <button class="btn-out" id="copyTxt" type="button" title="카페 댓글·카톡에 붙여넣을 수 있게 글로 복사합니다">결과 글로 복사</button>
-          <button class="btn" id="saveImg" type="button">이미지로 저장</button>
+          <button class="btn" id="saveImg" type="button" data-member-click="이미지로 저장">이미지로 저장</button>
         </span>
       </div>
     </div>
@@ -1251,13 +1252,18 @@ const PF = (() => {
   const LABEL = { Pre: '은퇴 전', Post: '은퇴 후' };
 
   function defState(ph) { return { mode: 'pf', h: QUICK[ph][0][1].map(([k, w]) => [k, w]) }; }
-  function getState(ph) {
+  function getState0(ph) {
     const s = S.v['pf' + ph];
     if (s && (s.mode === 'pf' || s.mode === 'man') && Array.isArray(s.h)) return s;
     return defState(ph);
   }
+  // 멤버십 잠금 중(TJLock.locked())에는 '직접 입력'으로 계산·표시한다. 저장된 종목·모드는 건드리지 않는다. 꺼져 있으면 그대로.
+  function getState(ph) {
+    const st = getState0(ph);
+    return (window.TJLock && TJLock.locked() && st.mode !== 'man') ? { mode: 'man', h: st.h } : st;
+  }
   function setState(ph, st) { S.v['pf' + ph] = st; S.example = false; save(); }
-  const isEditedPf = ph => JSON.stringify(getState(ph)) !== JSON.stringify(defState(ph));
+  const isEditedPf = ph => JSON.stringify(getState0(ph)) !== JSON.stringify(defState(ph));
 
   function info(key) {
     const it = U.get(key), p = PRESET[key];
@@ -1931,13 +1937,13 @@ function renderDiag(m) {
     const c3 = card('생활비', `월 ${fmtMan(d.maxLiving)}으로 맞추기`, `지금 계획 월 ${fmtMan(b.living)}에서 <b>${fmtMan(b.living - d.maxLiving)}</b> 줄이면 ${b.endAge}세까지 버팁니다(지금 돈 가치).`);
     const c4 = d.delay === null ? card('은퇴 시점', '10년 늦춰도 부족', '은퇴를 미루는 것만으로는 어렵습니다.', true)
       : card('은퇴 시점', `${d.delay}년 더 일하기 (${b.retireAge + d.delay}세 은퇴)`, `그동안 생활비는 근로소득으로 쓰고 월 ${fmtMan(b.save)}씩 계속 모은다는 가정입니다.`);
-    levers = `<div class="lever-t">부족분을 메우는 방법 — 하나만 골라도 됩니다</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때 필요한 숫자입니다. 두세 가지를 조금씩 섞으면 각각의 부담이 줄어듭니다.</div><div class="levers">${c1}${c2}${c3}${c4}</div>`;
+    levers = `<div class="lever-t">부족분을 메우는 방법 — 하나만 골라도 됩니다</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때 필요한 숫자입니다. 두세 가지를 조금씩 섞으면 각각의 부담이 줄어듭니다.</div><div data-member="부족분을 메우는 방법"><div class="levers">${c1}${c2}${c3}${c4}</div></div>`;
   } else {
     const c1 = card('생활비 여유', `월 ${fmtMan(d.maxLiving)}까지 써도 됨`, `지금 계획보다 <b>${fmtMan(d.maxLiving - b.living)}</b> 더 써도 ${b.endAge}세까지 버팁니다(지금 돈 가치).`);
     const c2 = card('필요 수익률', `은퇴 전 ${rpct(Math.max(b.rPre + d.reqD, 0))} · 은퇴 후 ${rpct(Math.max(b.rPost + d.reqD, 0))}면 충분`, `지금 가정(은퇴 전 ${m.rrPre}% · 은퇴 후 ${m.rr}%)보다 각각 <b>${rpct(-d.reqD)}p</b> 낮아도 됩니다. 은퇴 직전에는 변동이 작은 자산 비중을 늘려 지키는 쪽을 고민해 볼 만합니다.`);
     const c3 = d.earliest ? card('은퇴 시점', `${d.earliest}세 은퇴도 가능`, `지금 계획(${b.retireAge}세)보다 ${b.retireAge - d.earliest}년 일찍 그만둬도 ${b.endAge}세까지 버팁니다.`) : card('은퇴 시점', `${b.retireAge}세 은퇴 유지`, '더 앞당기면 부족해집니다.', true);
     const c4 = card('더 오래 산다면', okSim({ ...b, endAge: b.endAge + 5 }) ? `${b.endAge + 5}세까지도 버팀` : `${b.endAge + 5}세까지는 부족`, `계획 나이를 5년 늘려 확인한 결과입니다. 장수 위험에 대비해 종신으로 나오는 국민연금의 비중을 함께 보세요.`);
-    levers = `<div class="lever-t">여유를 쓰는 방법</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때의 숫자입니다.</div><div class="levers">${c1}${c2}${c3}${c4}</div>`;
+    levers = `<div class="lever-t">여유를 쓰는 방법</div><div class="lever-sub">각 카드는 나머지 조건은 그대로 두고 그 하나만 바꿨을 때의 숫자입니다.</div><div data-member="여유를 쓰는 방법"><div class="levers">${c1}${c2}${c3}${c4}</div></div>`;
   }
   const leaks = [];
   if (m.engine && !m.cOk) leaks.push(`연금 세액공제 받은 원금·수익을 1년에 <b>${fmtMan(m.wcIn)}</b> 꺼내 연 1,500만원 선을 넘습니다. 계좌를 나누면 세금이 줄어듭니다 (4단계).`);
