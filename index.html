@@ -1900,7 +1900,7 @@ function renderDiag(m) {
   const row = (l, r, hl) => `<div class="diag-row${hl ? ' hl' : ''}"><span class="l">${l}</span><span class="r">${r}</span></div>`;
   let head;
   if (d.ok) {
-    const endReal = Math.max(0, d.res.endBal / Math.pow(1 + b.inf, b.endAge + 1 - b.curAge));
+    const endReal = Math.max(0, d.res.endBal / Math.pow(1 + b.inf, Math.max(b.endAge, d.res.startRet) - b.curAge));   // endBal은 계획 나이 시점 잔액 (차트 끝점과 같은 기준)
     d.endReal = endReal;
     head = `<div class="diag"><div class="diag-k">최종 진단</div>
       <div class="diag-v">${b.endAge}세까지 <em>버팁니다</em></div>
