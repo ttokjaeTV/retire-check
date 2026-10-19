@@ -692,7 +692,7 @@
           </div>
         </div>
         <div class="grid-3" style="margin-top:14px">
-          <div class="field"><label class="label" for="inf">물가상승률 (연)</label><div class="input-wrap"><input type="number" id="inf" step="0.5" min="0" max="10" placeholder="2.5"><span class="unit">%</span></div><div class="input-hint">한국은행 물가안정목표는 2%입니다.</div></div>
+          <div class="field"><label class="label" for="inf">물가상승률 (연)</label><div class="input-wrap"><input type="number" id="inf" step="0.5" min="0" max="10" placeholder="2.5"><span class="unit">%</span></div><div class="input-hint">한국은행 물가안정목표는 2%입니다.</div></div> <!-- rules-ok: 물가 가정 기본값(제도 아님) -->
           <div class="field"><label class="label" for="endAge">몇 세까지 계획</label><div class="input-wrap"><input type="number" id="endAge" min="70" max="110" placeholder="90"><span class="unit">세</span></div><div class="input-hint">60세 은퇴, 90세까지면 30년</div></div>
           <div class="field"><label class="label" for="save">은퇴 전까지 월 저축</label><div class="input-wrap"><input type="text" inputmode="numeric" id="save" data-money placeholder="0"><span class="unit">만원</span></div></div>
         </div>
@@ -1523,7 +1523,7 @@ function model() {
 
   m.rr = Math.round(PF.rate('Post', has('rr') ? clamp(num('rr'), -5, 20) : 4) * 10) / 10;            // 은퇴 후 수익률 (종목 조합 또는 직접 입력)
   m.rrPre = Math.round(PF.rate('Pre', has('rrPre') ? clamp(num('rrPre'), -5, 20) : 6) * 10) / 10;     // 은퇴 전 수익률
-  m.inf = has('inf') ? clamp(num('inf'), 0, 10) : 2.5;
+  m.inf = has('inf') ? clamp(num('inf'), 0, 10) : 2.5; // rules-ok: 물가 가정 기본값(제도 아님)
   m.endAge = has('endAge') ? clamp(num('endAge'), 70, 110) : 90;
   m.save = num('save');
   m.spNps = num('spNps'); m.spFin = num('spFin');
