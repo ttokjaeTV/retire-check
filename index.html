@@ -943,9 +943,11 @@
     <div class="step-body">
       <div class="grid-2">
         <div class="field"><label class="label" for="other">근로·기타소득 (연)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="other" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="other"></div><div class="input-hint">은퇴 후 아르바이트·강의료 등. 4단계 세금 계산에도 다른 종합소득으로 넣습니다. 없으면 0.</div></div>
+        <div class="field"><label class="label" for="bizInc">사업·임대 소득 (연)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="bizInc" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="bizInc"></div><div class="input-hint">경비 뺀 소득금액 · 공동명의 임대는 내 지분만. 건보료 판정에만 씁니다. 없으면 0.</div></div>
         <div class="field"><label class="label" for="spNps">배우자 공적연금 월액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="spNps" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="spNps"></div></div>
         <div class="field"><label class="label" for="spFin">배우자 연간 배당·이자</label><div class="input-wrap"><input type="text" inputmode="numeric" id="spFin" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="spFin"></div></div>
-        <div class="field"><label class="label">&nbsp;</label><label class="check-row" style="margin-top:6px"><input type="checkbox" id="biz"> 사업자등록이 있고 사업소득이 나요</label></div>
+        <div class="field"><label class="label" for="spBizInc">배우자 사업·임대 소득 (연)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="spBizInc" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="spBizInc"></div><div class="input-hint">경비 뺀 소득금액 · 공동명의 임대는 배우자 지분만</div></div>
+        <div class="field"><label class="label">&nbsp;</label><label class="check-row" style="margin-top:6px"><input type="checkbox" id="biz"> 본인 사업자등록이 있거나 주택임대소득이 있어요</label><label class="check-row" style="margin-top:8px"><input type="checkbox" id="spBiz"> 배우자 사업자등록이 있거나 주택임대소득이 있어요</label><div class="input-hint">하나라도 해당하면 사업·임대 소득이 1원만 있어도 피부양자 탈락 (주택임대는 등록 안 해도 해당). 상가 임대 등만 있고 등록이 없으면 연 500만원까지</div></div>
       </div>
       <div class="result" id="r6"></div>
       <details class="more"><summary>자세히 알아보기 · 피부양자 기준과 관리 요령</summary><div class="more-body">
@@ -954,12 +956,12 @@
 <tr><td>국민연금·공무원연금 등 공적연금</td><td>전액 포함</td></tr>
 <tr><td>이자·배당 (금융소득)</td><td>1,000만원 넘으면 전액</td></tr>
 <tr><td>근로·기타소득</td><td>포함</td></tr>
-<tr><td>사업소득</td><td>있으면 원칙적으로 제외 대상</td></tr>
+<tr><td>사업·임대 소득</td><td>포함. 따로 사업자등록이 있거나 주택임대소득이 있으면 1원만 있어도 제외, 둘 다 없으면 연 500만원 넘을 때 제외</td></tr>
 <tr><td>연금저축·IRP 등 사적연금</td><td>포함 안 됨</td></tr></tbody></table>
 <h4>관리 요령</h4>
 <ul><li>금융소득은 ISA·연금계좌 안에서 받으면 판정 소득에 잡히지 않습니다.</li>
 <li>노후 생활비를 공적연금보다 사적연금에서 더 많이 받도록 짜면 기준선에서 멀어집니다.</li>
-<li>부부 중 한 명이 소득 기준을 넘으면 배우자도 함께 빠지는 경우가 있어 부부 단위로 봐야 합니다.</li>
+<li>소득·사업소득 요건은 부부 중 한 명만 걸려도 둘 다 빠집니다(재산 요건은 각자). 부부 단위로 봐야 합니다.</li>
 <li>건강보험공단은 해마다 전년도 소득·재산 자료로 자격을 다시 봅니다. 기준선 근처라면 매년 확인하세요.</li></ul>
 <p class="src">사적연금 제외는 현행 기준이며, 제도 개편 논의가 있어 매년 확인이 필요합니다. 정확한 판정은 국민건강보험공단(1577-1000)에서 확인하세요.</p>
 </div></details>
@@ -1012,7 +1014,7 @@
 <li><b>소득 공백(2·3단계)</b>: (국민연금 개시 나이 − 은퇴 나이) × 월 생활비 × 12. 여기와 3단계 시점별 비교표는 물가 인상을 넣지 않은 단순 합계입니다.</li>
 <li><b>연금 첫해 인출(4단계)</b>: ① 세액공제 안 받은 원금 → ② 퇴직금 → ③ 세액공제분·수익 순서로 빠진다고 보고, 세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했습니다.</li>
 <li><b>ISA 연금 이전 환급(5단계)</b>: 옮긴 돈의 10%(최대 300만원) × 세액공제율(16.5% 또는 13.2%).</li>
-<li><b>건보료 피부양자(6단계)</b>: 본인·배우자의 판정 소득을 각각 기준선과 비교합니다. 기준은 맨 아래 제도 기준을 따릅니다.</li></ul>
+<li><b>건보료 피부양자(6단계)</b>: 본인·배우자의 판정 소득을 각각 기준선과 비교하고, 사업·임대 소득 요건을 따로 봅니다. 기준은 맨 아래 제도 기준을 따릅니다.</li></ul>
 <h4>계산에 넣지 않은 것</h4>
 <ul><li>최종 진단에는 세금·건보료가 빠져 있습니다. 실제로 쓸 수 있는 돈은 이보다 조금 적습니다.</li>
 <li>해마다 오르내리는 수익률. 매년 같은 수익률로 굴린다고 봐서, 은퇴 직후 하락장을 먼저 만나는 경우는 따로 반영되지 않습니다.</li>
@@ -1027,7 +1029,7 @@
     · 연금소득세 3.3~5.5%, 사적연금 연 1,500만원 기준, 연금수령한도 = 평가액 ÷ (11 − 연금수령연차) × 120%, 퇴직금 연금수령 시 퇴직소득세 30%(10년차까지)·40%(11~20년차)·50%(20년 초과) 감면<br>
     · 국민연금 조기수령 1년당 6% 감액(최대 5년), 연기 1년당 7.2% 증액(최대 5년). 3단계 시점별 비교표는 기본이 은퇴 후 수익률로 오늘 가치 환산(단순 합계로 바꿔 볼 수 있음)이고, 점검표 평생 진단은 국민연금·생활비가 물가만큼 오른다고 가정했습니다.<br>
     · ISA 만기 후 60일 이내 연금계좌 이전 시 이전액의 10%, 최대 300만원 추가 세액공제<br>
-    · 건보료 피부양자: 합산소득 연 2,000만원 이하(공적연금 전액, 금융소득은 1,000만원 초과 시 전액 합산, 사적연금 제외), 재산세 과세표준 5.4억원 초과~9억원 이하면 소득 1,000만원 이하, 9억원 초과면 제외
+    · 건보료 피부양자: 합산소득 연 2,000만원 이하(공적연금 전액, 금융소득은 1,000만원 초과 시 전액 합산, 사적연금 제외), 재산세 과세표준 5.4억원 초과~9억원 이하면 소득 1,000만원 이하, 9억원 초과면 제외. 사업소득은 사업자등록이 있거나 주택임대소득이 있으면 1원만 있어도 제외, 둘 다 없으면 연 500만원 이하까지 인정(소득·사업소득 요건은 부부 중 한 명만 걸려도 둘 다 제외, 재산은 각자)
     <span class="footer-safe">🔒 입력한 숫자는 이 브라우저 안에서만 계산되며, 서버로 보내지 않습니다. 다시 열었을 때 이어 볼 수 있도록 입력값은 이 기기 브라우저에만 저장되고, '모두 비우고 시작'을 누르면 지워집니다.</span>
   </footer>
 </div>
@@ -1399,6 +1401,10 @@ function npsFactor(shift) { return shift < 0 ? 1 + 0.06 * shift : 1 + 0.072 * sh
 function ageRate(age) { return age < 70 ? 5.5 : age < 80 ? 4.4 : 3.3; }
 function propLimit(prop) { if (prop <= 54000) return 2000; if (prop <= 90000) return 1000; return null; }
 const finCount = f => f > 1000 ? f : 0;
+/* 피부양자 사업소득 요건: 사업자등록이 있거나 주택임대소득이 있으면 0원이어야, 둘 다 없으면 연 500만원 이하
+   (국민건강보험법 시행규칙 별표 1의2: 미등록 500만원 예외에서 주택임대소득은 제외 — pension-tax-sim·fin-income-tax·etf-vs-direct와 같은 규칙)
+   체크했는데 금액 칸이 비어 있으면 사업소득이 있다고 본다 (예전 체크박스 '사업자등록이 있고 사업소득이 나요' 저장값과 같은 판정) */
+function bizOk(reg, amt, filled) { return reg ? filled && amt <= 0 : amt <= 500; }
 
 /* ===== 계산 모델 ===== */
 function model() {
@@ -1491,12 +1497,16 @@ function model() {
   m.inf = has('inf') ? clamp(num('inf'), 0, 10) : 2.5;
   m.endAge = has('endAge') ? clamp(num('endAge'), 70, 110) : 90;
   m.save = num('save');
-  m.spNps = num('spNps'); m.spFin = num('spFin'); m.biz = $('biz').checked;
+  m.spNps = num('spNps'); m.spFin = num('spFin');
+  m.bizInc = Math.max(0, num('bizInc')); m.spBizInc = Math.max(0, num('spBizInc'));   // 사업·임대 소득금액 (만원/년, 경비 뺀 금액)
+  m.bizReg = $('biz').checked; m.spBizReg = $('spBiz').checked;                        // 사업자등록 또는 주택임대소득 있음
+  m.bizOk = bizOk(m.bizReg, m.bizInc, has('bizInc'));
+  m.spBizOk = bizOk(m.spBizReg, m.spBizInc, has('spBizInc'));
   m.myPub = m.npsSel * 12;
-  m.myInc = m.myPub + finCount(m.fin) + m.other;
-  m.spInc = m.spNps * 12 + finCount(m.spFin);
+  m.myInc = m.myPub + finCount(m.fin) + m.other + m.bizInc;
+  m.spInc = m.spNps * 12 + finCount(m.spFin) + m.spBizInc;
   m.lim = propLimit(m.prop);
-  if (m.lim === null || m.biz) m.hi = 'bad';
+  if (m.lim === null || !m.bizOk || !m.spBizOk) m.hi = 'bad';   // 사업소득 요건은 한 명만 걸려도 부부 둘 다 탈락
   else if (m.myInc > m.lim || m.spInc > 2000) m.hi = 'bad';
   else if (m.myInc > m.lim * 0.9 || m.spInc > 1800) m.hi = 'warn';
   else m.hi = 'ok';
@@ -1800,12 +1810,19 @@ function render6(m) {
   const lights = k => `<div class="signal"><span class="light g ${k === 'ok' ? 'on' : ''}"></span><span class="light y ${k === 'warn' ? 'on' : ''}"></span><span class="light r ${k === 'bad' ? 'on' : ''}"></span><span class="signal-text">${k === 'ok' ? '피부양자 유지' : k === 'warn' ? '경계' : '피부양자 제외 가능'}</span></div>`;
   let why;
   if (m.lim === null) why = `재산세 과세표준이 9억원을 넘어 소득과 관계없이 피부양자에서 제외됩니다.`;
-  else if (m.biz) why = `사업소득이 있으면 원칙적으로 피부양자가 될 수 없습니다.`;
+  else if (!m.bizOk || !m.spBizOk) {
+    const sp = m.bizOk, reg = sp ? m.spBizReg : m.bizReg, amt = sp ? m.spBizInc : m.bizInc, who = sp ? '배우자' : '본인';
+    why = reg && !has(sp ? 'spBizInc' : 'bizInc')
+      ? `${who} 사업자등록이나 주택임대소득이 있다고 체크했는데 사업·임대 소득 칸이 비어 있어, 소득이 있다고 보고 판정했습니다. 소득이 0원이면 0을 넣으세요.`
+      : reg ? `${who} 사업·임대 소득이 <b>${fmtMan(amt)}</b>입니다. 사업자등록이나 주택임대소득이 있으면 1원만 있어도 피부양자에서 빠집니다.`
+      : `${who} 사업·임대 소득 <b>${fmtMan(amt)}</b>이 연 500만원을 넘습니다. 사업자등록·주택임대소득이 없어도 500만원을 넘으면 피부양자에서 빠집니다.`;
+    why += ` 소득·사업소득 요건은 부부 중 한 명만 걸려도 둘 다 빠집니다.`;
+  }
   else if (m.myInc > m.lim) why = `본인 판정 소득 <b>${fmtMan(m.myInc)}</b>이 기준 <b>${fmtMan(m.lim)}</b>을 넘습니다.`;
-  else if (m.spInc > 2000) why = `배우자 판정 소득 <b>${fmtMan(m.spInc)}</b>이 2,000만원을 넘습니다. 부부 중 한 명이 넘으면 배우자도 함께 빠지는 운영 관행이 있습니다.`;
+  else if (m.spInc > 2000) why = `배우자 판정 소득 <b>${fmtMan(m.spInc)}</b>이 2,000만원을 넘습니다. 소득 요건은 부부 중 한 명만 넘어도 둘 다 빠집니다.`;
   else if (m.hi === 'warn') why = `기준선의 90%를 넘었습니다. 국민연금 인상이나 배당 증가로 내년에 넘을 수 있습니다.`;
   else why = `본인 ${fmtMan(m.myInc)}, 배우자 ${fmtMan(m.spInc)}으로 기준 안쪽입니다.`;
-  const room = m.lim !== null ? Math.max(0, m.lim - finCount(m.fin) - m.other) : 0;
+  const room = m.lim !== null ? Math.max(0, m.lim - finCount(m.fin) - m.other - m.bizInc) : 0;
   $('r6').innerHTML = `
     ${lights(m.hi)}
     <div class="verdict ${m.hi}">${why}</div>
@@ -1813,6 +1830,7 @@ function render6(m) {
       <tr><td>공적연금 (전액)</td><td>${fmtMan(m.myPub)}</td><td>${fmtMan(m.spNps * 12)}</td></tr>
       <tr><td>금융소득 (1,000만원 초과 시 전액)</td><td>${fmtMan(finCount(m.fin))}</td><td>${fmtMan(finCount(m.spFin))}</td></tr>
       <tr><td>근로·기타소득</td><td>${fmtMan(m.other)}</td><td>-</td></tr>
+      <tr><td>사업·임대 소득 (따로 0원 또는 500만원 요건)</td><td>${fmtMan(m.bizInc)}${m.bizReg ? ' · 등록·주택임대 있음' : ''}</td><td>${fmtMan(m.spBizInc)}${m.spBizReg ? ' · 등록·주택임대 있음' : ''}</td></tr>
       <tr><td>사적연금 (연금저축·IRP)</td><td>제외</td><td>제외</td></tr>
       <tr class="sel"><td>합계 / 기준</td><td>${fmtMan(m.myInc)} / ${m.lim === null ? '재산 초과' : fmtMan(m.lim)}</td><td>${fmtMan(m.spInc)} / 2,000만원</td></tr>
     </tbody></table>
@@ -2030,7 +2048,7 @@ function renderAll() {
 }
 
 /* ===== 이벤트 ===== */
-const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'biz', 'rr', 'rrPre', 'inf', 'endAge', 'save'];
+const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'bizInc', 'spBizInc', 'biz', 'spBiz', 'rr', 'rrPre', 'inf', 'endAge', 'save'];
 function restore() {
   FIELDS.forEach(id => { const el = $(id); if (!el || !(id in S.v)) return; if (el.type === 'checkbox') el.checked = !!S.v[id]; else el.value = S.v[id]; });
 }
