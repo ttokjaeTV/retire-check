@@ -1039,8 +1039,11 @@
 <script src="https://ttokjaetv.github.io/rules/fill-v1.js"></script>
 <!-- 공용 계산 엔진 (세액·공제·건보료 계산 — rules.js 다음, 아래 연금 인출 세금 엔진보다 먼저) -->
 <script src="https://ttokjaetv.github.io/rules/calc-v1.js"></script>
-<!-- 4단계 세금 계산: 연금 인출 세금 시뮬레이터와 같은 엔진을 공유 (불러오지 못하면 간이 계산으로 대체) -->
-<script src="https://ttokjaetv.github.io/pension-tax-sim/src/engine.js"></script>
+<!-- 4단계 인출 시뮬레이션: 연금 인출 세금 시뮬레이터(pension-tax-sim)의 엔진을 '커밋 고정' 주소로 불러온다.
+     pension-tax-sim을 고쳐도 이 페이지 결과는 말없이 바뀌지 않는다. 새 엔진을 쓰려면 아래 커밋 번호를 바꾸고
+     전·후 결과를 확인한 뒤 배포한다. 법정 계산(퇴직소득세 등)은 공용 엔진 calc-v1로 직접 한다.
+     (불러오지 못하면 간이 계산으로 대체) -->
+<script src="https://cdn.jsdelivr.net/gh/ttokjaeTV/pension-tax-sim@36e10ff9f82f8d94d07eccf28d00dbcc78024d29/src/engine.js"></script>
 <!-- 공용 프리셋 (못 불러오면 아래 내장 값 사용) -->
 <script src="https://ttokjaetv.github.io/portfolio-sheet-data/data/presets.js"></script>
 <script>
@@ -1051,6 +1054,7 @@ if (!window.TTOKJAE_RULES || !window.TTOKJAE_CALC) {
   document.body ? tjrShow() : document.addEventListener('DOMContentLoaded', tjrShow);
   throw new Error(TJR_MSG);
 }
+const RC_CALC = TTOKJAE_CALC.bind(TTOKJAE_RULES);   // 공용 계산 엔진 (pension-tax-sim 엔진의 PTS_CALC와 겹치지 않는 이름)
 /* ===== 설정 ===== */
 const STORE_KEY = 'retireCheck.v1';
 
@@ -1483,11 +1487,11 @@ function model() {
   m.retYears = has('retYears') ? clamp(num('retYears'), 1, 50) : 20;
   m.eligAge = MIN_AGE;   // 연금 받을 자격이 생긴 나이 = 55세 가정 (위 m.year1 주석)
   m.engine = null;
-  m.engineMissing = typeof simulate !== 'function' || typeof retirementTax !== 'function';
+  m.engineMissing = typeof simulate !== 'function';   // 퇴직소득세는 calc-v1(RC_CALC)로 직접 계산
   if (!m.engineMissing && m.wAge >= MIN_AGE && m.pensionTotal > 0 && m.wAmt > 0) {
     try {
       const W = 10000;
-      const retTaxNat = retirementTax(m.retire * W, m.retYears);
+      const retTaxNat = RC_CALC.retirementTax.calc(m.retire * W, m.retYears).national;
       const res = simulate({
         startAge: m.wAge, eligAge: m.eligAge, pre2013: $('oldAcct').checked,
         b1: A * W, b2: B * W, retTaxNat, b3: C * W, r: 0,
@@ -1702,7 +1706,7 @@ function splitSim(m) {
     const W = 10000;
     const base = {
       startAge: m.wAge, eligAge: m.eligAge, pre2013: $('oldAcct').checked,
-      b1: m.noded * W, b2: m.retire * W, retTaxNat: retirementTax(m.retire * W, m.retYears), b3: Math.max(0, m.ps + m.irp - m.noded) * W,
+      b1: m.noded * W, b2: m.retire * W, retTaxNat: RC_CALC.retirementTax.calc(m.retire * W, m.retYears).national, b3: Math.max(0, m.ps + m.irp - m.noded) * W,
       r: m.rr / 100, years: 1, phase1Amount: 0, publicPension: m.npsSel * 12 * W, publicStartAge: m.npsStart, otherIncome: m.other * W, maxAge: 100,
     };
     const one = simulate({ ...base, mode: 'amount', amount: m.wAmt * W, desired: 0, capAmount: 0 });
