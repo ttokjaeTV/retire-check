@@ -1507,11 +1507,13 @@ function model() {
   m.overE = m.hasE ? Math.max(0, m.wa + m.wc - m.limitE) : 0;
   m.wcOut = Math.min(m.wc, m.overE);
   m.wcIn = m.wc - m.wcOut;
+  if (m.wAge < MIN_AGE) { m.wcOut = m.wc; m.wcIn = 0; }   // 55세 전 인출은 전부 연금외수령 → 1,500만원 판정 대상 없음 (③은 기타소득세)
   m.cOk = m.wcIn <= SEP_MAN;
 
   /* 엔진 계산 (첫해) — 단위: 원 → 만원. 계좌마다 따로 불러 더함 (세금은 ② 퇴직소득세 · ③ 연금소득세 · 한도 초과 기타소득세로 계좌별로 나뉨) */
   m.other = num('other');   // 6단계 근로·기타소득 (만원/년) → 다른 종합소득으로 세금 계산에 포함
   m.retYears = has('retYears') ? clamp(num('retYears'), 1, 50) : 20;
+  m.retTaxFree = m.retire > 0 && RC_CALC.retirementTax.calc(m.retire * 10000, m.retYears).national <= 0;   // 근속연수공제 안이라 퇴직소득세 0 → 55세 전에 꺼내도 퇴직금 몫 세금 없음
   m.engine = null;
   m.limitNote = null;   // 한도 초과 안내 (엔진 계산이 있을 때만)
   m.engineMissing = typeof simulate !== 'function';   // 퇴직소득세는 calc-v1(RC_CALC)로 직접 계산
@@ -1874,11 +1876,12 @@ function limParts(m) {
 }
 /* 한도 초과 몫을 다른 계좌로 옮겨 꺼내면 줄어드는 첫해 세금 (가장 싼 후보 기준, 0.5만원 이하·55세 전·엔진 없음은 0) — 점검표·새는 돈·복사 글 공통 */
 const limitSave = m => m.limitOver > 0 && m.wAge >= MIN_AGE && m.limitNote && m.limitNote.save > 0.5 ? m.limitNote.save : 0;
-/* 요건 전 인출 중 세금이 붙는 몫 — 점검표 4번 빨강과 '새는 돈' 공통 기준. ①(세액공제 받지 않은 원금)은 언제 꺼내도 세금이 없어 빼고,
-   55세 전이면 ②+③(연금외수령), 연금저축·IRP 가입 5년 전이면 그 계좌의 ③(기타소득세)만 셈 */
-const preTaxed = m => m.wAge < MIN_AGE ? m.wb + m.wc : m.preElig ? m.wc : 0;
+/* 요건 전 인출 중 세금이 붙는 몫 — 4단계 판정 상자·점검표 4번 빨강·'새는 돈' 공통 기준. ①(세액공제 받지 않은 원금)은 언제 꺼내도 세금이 없어 빼고,
+   55세 전이면 ②(퇴직소득세가 있을 때만)+③(연금외수령), 연금저축·IRP 가입 5년 전이면 그 계좌의 ③(기타소득세)만 셈 */
+const preTaxedR = m => m.wAge < MIN_AGE && !m.retTaxFree ? m.wb : 0;
+const preTaxed = m => m.wAge < MIN_AGE ? preTaxedR(m) + m.wc : m.preElig ? m.wc : 0;
 const preOnly1 = m => m.preElig && m.wa > 0 && preTaxed(m) <= 0;   // 연금저축·IRP 요건 전이지만 그 계좌에서는 ①만 꺼내 그 몫 세금 0
-function limText(m) { const p = limParts(m); return p.length > 1 ? p.map(x => `${x.nm} ${limFmt(x.v)}`).join(' · ') : limFmt(m.limit); }
+function limText(m) { if (m.wAge < MIN_AGE) return `해당 없음(${MIN_AGE}세 전)`; const p = limParts(m); return p.length > 1 ? p.map(x => `${x.nm} ${limFmt(x.v)}`).join(' · ') : limFmt(m.limit); }
 /* 4단계 한도 초과 안내 — 넘친 몫은 이미 '연금외수령'으로 세금 계산에 들어가 있으므로 경고가 아니라 안내.
    그 몫을 다른 계좌의 남은 한도까지 옮겨 꺼낸 경우의 세금(m.limitNote.alt, 같은 엔진으로 계산)을 함께 보여 줌 */
 function limitNoteHtml(m, parts) {
@@ -1927,13 +1930,24 @@ function render4(m) {
   const tot = Math.max(m.wAmt, 1);
   const seg = (v, c, t) => v > 0 ? `<div class="hbar-fill" style="width:${v / tot * 100}%;background:${c}" title="${t}"></div>` : '';
   let verdicts = '';
-  if (m.wAge < MIN_AGE) verdicts += `<div class="verdict bad">${MIN_AGE}세 전에 꺼내면 '연금수령'이 아니어서 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}, 퇴직금은 감면 없이 과세됩니다.</div>`;
+  /* 55세 전·요건 전 인출: 세금이 붙는 몫(preTaxed)이 있으면 빨강, ①이나 퇴직소득세 0인 퇴직금만 꺼내면 안내 상자 (점검표 4번과 같은 기준) */
+  const freeList = list => list.filter(Boolean).join('과 ');
+  if (m.wAge < MIN_AGE) {
+    const rFree = m.wb > 0 && m.retTaxFree;
+    if (preTaxed(m) > 0) verdicts += `<div class="verdict bad">${MIN_AGE}세 전에 꺼내면 '연금수령'이 아니어서 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}, 퇴직금은 감면 없이 과세됩니다.${rFree ? ' 다만 이 퇴직금은 근속연수공제 안이라 퇴직소득세가 0원이에요.' : ''}</div>`;
+    else {
+      const free = freeList([m.wa > 0 ? `세액공제 받지 않은 원금 ${fmtMan(m.wa)}` : '', rFree ? `퇴직금 ${fmtMan(m.wb)}(퇴직소득세 0원)` : '']);
+      verdicts += `<div class="verdict info"><span class="vi" aria-hidden="true">i</span>${MIN_AGE}세 전에 꺼내면 '연금수령'이 아니지만, ${free ? `지금 꺼내는 ${free}은 세금이 없어요` : '지금은 꺼내는 금액이 없어요'}. 세액공제 받은 원금·수익은 이때 꺼내면 기타소득세 ${T_OTHR}라 ${MIN_AGE}세 이후로 미뤄 두세요.</div>`;
+    }
+  }
   const parts = limParts(m);
-  if (m.preElig && m.wa + m.wc > 0) verdicts += `<div class="verdict bad">연금저축·IRP는 가입 ${JOIN_YEARS}년을 채운 ${m.eligAge}세 해(${m.birth + m.eligAge}년)부터 연금으로 받을 수 있습니다. ${m.wAge}세에 이 계좌에서 꺼내는 ${fmtMan(m.wa + m.wc)}은 '연금외수령'이라 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}입니다.</div>`;
+  if (m.preElig && m.wc > 0) verdicts += `<div class="verdict bad">연금저축·IRP는 가입 ${JOIN_YEARS}년을 채운 ${m.eligAge}세 해(${m.birth + m.eligAge}년)부터 연금으로 받을 수 있습니다. ${m.wAge}세에 이 계좌에서 꺼내는 ${fmtMan(m.wa + m.wc)}은 '연금외수령'이라 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}입니다.</div>`;
+  else if (m.preElig && m.wa > 0) verdicts += `<div class="verdict info"><span class="vi" aria-hidden="true">i</span>연금저축·IRP는 가입 ${JOIN_YEARS}년을 채운 ${m.eligAge}세 해(${m.birth + m.eligAge}년)부터 연금으로 받을 수 있어요. ${m.wAge}세에 이 계좌에서 꺼내는 ${fmtMan(m.wa)}은 세액공제 받지 않은 원금이라 세금이 없어요. 세액공제 받은 원금·수익은 그 전에 꺼내면 기타소득세 ${T_OTHR}라 ${m.eligAge}세 이후로 미뤄 두세요.</div>`;
   if (m.limitOver > 0 && m.wAge >= MIN_AGE) verdicts += limitNoteHtml(m, parts);
   if (m.wOver > 0) verdicts += `<div class="verdict warn">연금계좌 잔액보다 <b>${fmtMan(m.wOver)}</b> 많이 꺼내는 계획입니다.</div>`;
   const e = m.engine;
-  if (m.wcIn === 0) verdicts += `<div class="verdict ok">첫해에는 세금 없는 원금과 퇴직금만 꺼내서 연 ${T_SEP}만원 판정 대상이 없습니다. 세액공제 받은 원금·수익은 뒤로 미뤄 두고, 꺼낼 때 1년에 ${T_SEP}만원 이하로 나누면 됩니다.</div>`;
+  if (m.wAge < MIN_AGE) { /* 55세 전: 위 상자로 설명, 1,500만원 판정은 연금수령에만 해당 */ }
+  else if (m.wcIn === 0) verdicts += `<div class="verdict ok">첫해에는 세금 없는 원금과 퇴직금만 꺼내서 연 ${T_SEP}만원 판정 대상이 없습니다. 세액공제 받은 원금·수익은 뒤로 미뤄 두고, 꺼낼 때 1년에 ${T_SEP}만원 이하로 나누면 됩니다.</div>`;
   else if (m.cOk) verdicts += `<div class="verdict ok">한도 안 세액공제 받은 원금·수익 인출이 <b>${fmtMan(m.wcIn)}</b>으로 연 ${T_SEP}만원 이하입니다. 연금소득세 약 <b>${fmtMan(e ? e.taxPension : m.wcIn * m.rate / 100)}</b>으로 끝납니다(${e ? e.method : m.rate + '%'}).${m.wcIn < SEP_MAN ? ` ${T_SEP}만원까지 ${fmtMan(SEP_MAN - m.wcIn)} 여유가 있습니다.` : ''}</div>`;
   else verdicts += `<div class="verdict warn">한도 안 세액공제 받은 원금·수익 인출이 <b>${fmtMan(m.wcIn)}</b>으로 연 ${T_SEP}만원을 넘습니다. 넘는 금액만이 아니라 <b>전액</b>이 종합과세 또는 ${T_SEPR} 분리과세 대상입니다. ${e ? `국민연금까지 합쳐 계산하면 <b>${e.method.replace(' 선택', '')}</b>가 유리하고, 이 몫의 세금은 약 <b>${fmtMan(e.taxPension)}</b>입니다.` : `${T_SEPR} 분리과세면 약 ${fmtMan(m.wcIn * PEN.separateRate)}입니다.`} 계좌를 나누거나 받는 해를 늘리는 설계가 필요합니다.</div>`;
   const taxBlock = e ? `
@@ -1946,10 +1960,10 @@ function render4(m) {
   $('r4').innerHTML = `
     <div class="stat-grid">
       ${stat('연금계좌 평가액', fmtMan(m.pensionTotal), '퇴직금 + 연금저축 + IRP')}
-      ${parts.length > 1
+      ${m.wAge < MIN_AGE ? stat('첫해 연금수령한도', '해당 없음', `${MIN_AGE}세 해부터 연금수령`, true) : parts.length > 1
         ? stat('첫해 연금수령한도', isFinite(m.limit) ? fmtMan(m.limit) : parts.every(x => !isFinite(x.v)) ? '한도 없음' : '일부 한도 없음', parts.map(x => `${x.nm} ${limFmt(x.v)}(${x.pre ? `${m.eligAge}세부터` : `${x.y}년차`})`).join(' + '), true)
         : stat('첫해 연금수령한도', lim, m.preElig && !m.hasR ? `${m.eligAge}세 해부터 연금수령` : isFinite(m.limit) ? `평가액 ÷ (${PEN.payoutLimitFreeYear} − ${m.hasR ? m.yearR : m.yearE}) × ${pctNum(PEN.payoutLimitFactor)}%` : `${PEN.payoutLimitFreeYear}년차 이후`, true)}
-      ${stat(`${T_SEP}만원 판정 대상`, fmtMan(m.wcIn), m.wcOut > 0 ? `한도 초과 ${fmtMan(m.wcOut)}은 기타소득세 ${T_OTHR}` : '세액공제 받은 원금 + 운용수익 인출')}
+      ${stat(`${T_SEP}만원 판정 대상`, fmtMan(m.wcIn), m.wAge < MIN_AGE ? `${MIN_AGE}세 전 인출은 연금외수령이라 해당 없음` : m.wcOut > 0 ? `한도 초과 ${fmtMan(m.wcOut)}은 기타소득세 ${T_OTHR}` : '세액공제 받은 원금 + 운용수익 인출')}
     </div>
     <div style="margin-top:20px"><span class="label">첫해 ${fmtMan(m.wAmt)}은 ① → ② → ③ 순서로 꺼낸다고 봅니다 (②는 퇴직금을 받은 IRP, ①·③은 연금저축·IRP)</span>
       <div class="hbar-track" style="height:28px;margin-top:6px">${seg(m.wa, '#C4A57B', '세액공제 받지 않은 원금')}${seg(m.wb, '#8B6F47', '퇴직금')}${seg(m.wc, '#D9542B', '세액공제 받은 원금·수익')}${seg(m.wOver, '#C4B8A3', '잔액 초과')}</div>
@@ -2166,7 +2180,7 @@ function renderDiag(m) {
   const leaks = [];
   if (m.engine && !m.cOk) leaks.push(`연금 세액공제 받은 원금·수익을 1년에 <b>${fmtMan(m.wcIn)}</b> 꺼내 연 ${T_SEP}만원 선을 넘습니다. 계좌를 나누면 세금이 줄어듭니다 (4단계).`);
   /* 4단계: 55세 전·연금저축·IRP 요건 전 인출(점검표 빨강 사유)은 그대로 '새는 돈'. 한도 초과는 꺼내는 계좌를 바꿔 세금이 줄 때만, 그 절약액으로 (지금이 가장 싸면 넣지 않음) */
-  if (m.wAge < MIN_AGE && preTaxed(m) > 0) leaks.push(`${MIN_AGE}세 전에 꺼내는 퇴직금·세액공제 받은 원금·수익 <b>${fmtMan(m.wb + m.wc)}</b>은 연금외수령이라 높은 세율로 과세됩니다 (4단계).`);
+  if (m.wAge < MIN_AGE && preTaxed(m) > 0) leaks.push(`${MIN_AGE}세 전에 꺼내는 ${[preTaxedR(m) > 0 ? '퇴직금' : '', m.wc > 0 ? '세액공제 받은 원금·수익' : ''].filter(Boolean).join('·')} <b>${fmtMan(preTaxed(m))}</b>은 연금외수령이라 높은 세율로 과세됩니다 (4단계).`);
   if (m.wAge >= MIN_AGE && m.preElig && preTaxed(m) > 0) leaks.push(`연금저축·IRP 가입 ${JOIN_YEARS}년 전에 꺼내는 세액공제 받은 원금·수익 <b>${fmtMan(m.wc)}</b>은 기타소득세 ${T_OTHR}로 과세됩니다 (4단계).`);
   const lSave = limitSave(m);
   if (lSave > 0) leaks.push(`첫해 인출이 연금수령한도를 ${fmtMan(m.limitOver)} 넘습니다. 꺼내는 계좌를 바꾸면 첫해 세금 <b>${fmtMan(lSave)}</b> 절약 (4단계).`);
@@ -2200,7 +2214,7 @@ function renderSummary(m) {
     ['소득 공백', `${m.gap}년 · ${fmtMan(m.gapNeed)}`, short > 0 ? `ISA·일반으로 ${fmtMan(short)} 부족` : 'ISA·일반으로 충당 가능', m.gap === 0 || short === 0 ? flag('ok', '충분') : flag('warn', '⚠️ 부족')],
     ['국민연금', m.nps ? `${m.birth + m.npsStart}년(${m.npsStart}세)부터 월 ${fmtMan(m.npsSel)}` : `${m.birth + m.npsStart}년(${m.npsStart}세)부터 · 예상액 미입력`, m.shift === 0 ? '정상 수령' : m.shift < 0 ? `${-m.shift}년 당겨 받기` : `${m.shift}년 미뤄 받기`, ''],
     ['연금 첫해 인출', `${fmtMan(m.wAmt)} / 한도 ${lim}`, (m.engine ? `첫해 세금 약 ${fmtMan(m.engine.tax)} · ` : '') + `${T_SEP}만원 판정 대상 ${fmtMan(m.wcIn)}` + (c4 === 'save' ? ` · 꺼내는 계좌를 바꾸면 ${fmtMan(lSave)} 절약` : ''),
-      c4 === 'ok' ? flag('ok', '저율 과세') : c4 === 'pre55' ? flag('info', `${MIN_AGE}세 전 · 세금 없음`) : c4 === 'pre1' ? flag('info', '요건 전 · ① 세금 없음') : c4 === 'info' ? flag('info', '한도 초과분 세금 반영') : c4 === 'save' ? flag('warn', '⚠️ 계좌 바꾸면 절약') : c4 === 'warn' ? flag('warn', `⚠️ ${T_SEP}만원 초과`) : flag('bad', '⚠️ 한도·나이 확인')],
+      c4 === 'ok' ? flag('ok', '저율 과세') : c4 === 'pre55' ? flag('info', `${MIN_AGE}세 전 · 세금 없음`) : c4 === 'pre1' ? flag('info', '요건 전 · 세금 없는 원금만') : c4 === 'info' ? flag('info', '한도 초과분 세금 반영') : c4 === 'save' ? flag('warn', '⚠️ 계좌 바꾸면 절약') : c4 === 'warn' ? flag('warn', `⚠️ ${T_SEP}만원 초과`) : flag('bad', '⚠️ 한도·나이 확인')],
     ['ISA 만기 연금 이전', `환급 약 ${fmtMan(m.isaRefund)}`, m.isaDate ? `${addDays(m.isaDate, 60)}까지 이전` : '만기일 미입력', m.isaMove > 0 ? flag('ok', '챙길 것') : ''],
     ['건보료 피부양자', m.hi === 'ok' ? '유지' : m.hi === 'warn' ? '경계' : '제외 가능', `본인 판정 소득 ${fmtMan(m.myInc)}`, m.hi === 'ok' ? flag('ok', '안전') : m.hi === 'warn' ? flag('warn', '⚠️ 경계') : flag('bad', '⚠️ 제외')]
   ];
