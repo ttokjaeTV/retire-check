@@ -1834,11 +1834,11 @@ function splitBlock(m) {
     ${acct(1, '세액공제 받지 않은 원금', '별도 연금저축 계좌 · 세액공제 한도 넘겨 넣은 원금', A, '#C4A57B', '#3A2F26',
       ['꺼낼 때 <b>세금 0원</b>', `${T_SEP}만원 계산에서 빠짐`, '연금저축이면 필요할 때 일부 인출 가능', '※ 이 계좌에서 생긴 수익은 ③처럼 과세'], f.a, f.a > 0 ? '부족분 보충' : '')}
     ${acct(2, '퇴직금', '퇴직금을 받은 IRP', B, '#8B6F47', '#FFFFFF',
-      [`퇴직소득세 <b>${T_CUT[0]} 감면</b> (${PPR[0][0] + 1}년차부터 ${T_CUT[1]}, ${PPR[1][0] + 1}년차부터 ${T_CUT[2]})`, `${T_SEP}만원 계산에서 빠짐`, '※ 감면 연차는 실제로 받은 해만 셈 → 소액이라도 일찍 개시'], f.b, f.b > 0 ? '나머지 보충' : '①로 충분')}
+      [`퇴직소득세 <b>${T_CUT[0]} 감면</b> (${PPR[0][0] + 1}년차부터 ${T_CUT[1]}, ${PPR[1][0] + 1}년차부터 ${T_CUT[2]})`, `${T_SEP}만원 계산에서 빠짐`, '※ 감면 연차는 실제로 받은 해만 셈 → 소액이라도 일찍 개시'], f.b, f.b > 0 ? '나머지 보충' : f.a > 0 ? '①로 충분' : '')}
   </div>`;
   let cmp = '';
   if (A + B <= 0) {
-    cmp = `<div class="verdict warn">①·② 계좌가 비어 있어 지금은 나눠도 차이가 없습니다. 1단계 '더 정확하게'에 세액공제 받지 않은 원금이 있으면 넣어 보세요. 아직 넣는 중이라면 세액공제 한도(연금저축 ${comma(PSV.creditLimitPensionSavings / 1e4)}만원, IRP 합산 ${comma(PSV.creditLimitTotal / 1e4)}만원)를 넘기는 돈부터 별도 계좌로 모으면 됩니다.</div>`;
+    cmp = `<div class="verdict warn">①·② 계좌가 비어 있어 지금은 나눠도 차이가 없습니다. 1단계 '더 정확하게'에 세액공제 받지 않은 원금이 있으면 넣어 보세요.</div>`;   // 세액공제 한도 안내는 아래 '아직 넣는 중이라면'에 있어 여기서는 뺌
   } else if (sim) {
     const o = sim.one, p = sim.sp, d = o.tax - p.tax;
     const yrs = k => k >= 100 - m.wAge + 1 ? `${100 - m.wAge + 1}년<small>100세까지</small>` : k <= 0 ? `없음<small>첫해부터 부족</small>` : `${k}년<small>${m.wAge}~${m.wAge + k - 1}세</small>`;
@@ -1888,7 +1888,7 @@ function limitNoteHtml(m, parts) {
   const n = m.limitNote, e = m.engine, two = parts.length > 1;
   const pR = parts.find(x => x.nm === '퇴직금 IRP'), pE = parts.find(x => x.nm === '연금저축·IRP');
   const said = [];
-  if (m.overR > 0.5) said.push(`${two ? '퇴직금 IRP 한도' : '연금수령한도'} ${limFmt(pR ? pR.v : m.limit)}을 ${fmtMan(m.overR)} 넘겨, 그만큼은 <b>퇴직소득세 감면 없이</b> 과세했어요${n ? `(세금 +${fmtMan(n.extra2)})` : ''}`);
+  if (m.overR > 0.5) said.push(`${two ? '퇴직금 IRP 한도' : '연금수령한도'} ${limFmt(pR ? pR.v : m.limit)}을 ${fmtMan(m.overR)} 넘겨, 그만큼은 <b>퇴직소득세 감면 없이</b> 과세했어요${n && Math.round(n.extra2) !== 0 ? `(세금 +${fmtMan(n.extra2)})` : ''}`);   // 만원 단위로 0원이면 '(세금 +0원)'을 숨김
   if (m.overE > 0.5) {
     const o3 = n ? n.over3 : m.wcOut, o1 = n ? n.over1 : Math.max(0, m.overE - m.wcOut), sub = [];
     if (o3 > 0.5) sub.push(`세액공제 받은 원금·수익 ${fmtMan(o3)}은 <b>기타소득세 ${T_OTHR}</b>로 과세했어요${n ? `(이 몫 세금 ${fmtMan(n.tax3)})` : ''}`);
