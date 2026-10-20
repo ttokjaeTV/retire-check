@@ -827,7 +827,10 @@
         <div class="field"><label class="label" for="wAmt">첫해 인출 계획액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="wAmt" data-money><span class="unit">만원</span></div><div class="chip-read" data-for="wAmt"></div><div class="input-hint" id="wAmtHint"></div></div>
         <div class="field"><label class="label" for="retYears">근속연수 (퇴직금 세금 계산용)</label><div class="input-wrap"><input type="number" id="retYears" min="1" max="50" placeholder="20"><span class="unit">년</span></div><div class="input-hint">비워두면 20년으로 계산합니다. 퇴직금이 없으면 무시됩니다.</div></div>
       </div>
-      <label class="check-row"><input type="checkbox" id="oldAcct"> 2013년 3월 이전에 가입한 연금계좌가 있어요 (수령한도 계산이 <span data-rule="PENSION.pre2013StartYear">6</span>년차부터 시작)</label>
+      <div class="grid-3" style="margin-top:14px">
+        <div class="field"><label class="label" for="joinYear">연금저축·IRP 가입 연도 (선택)</label><div class="input-wrap"><input type="number" id="joinYear" min="1990" max="2100" placeholder="5년 넘음"><span class="unit">년</span></div><div class="input-hint">비워두면 가입 5년을 이미 채운 것으로 봅니다. 퇴직금을 받은 IRP는 따로 계산합니다.</div></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="oldAcct"> 2013년 3월 이전에 가입한 연금저축·IRP예요 (그 계좌 수령한도 계산이 <span data-rule="PENSION.pre2013StartYear">6</span>년차부터 시작)</label>
       <details class="guide" id="guideAcct">
         <summary>
           <span class="guide-ic">📄</span>
@@ -847,8 +850,8 @@
                 <div class="how-t">어떻게 정하나요?</div>
                 <div class="formula-box">
                   <div>연금 받을 자격 = <b><span data-rule="PENSION.minAge">55</span>세</b>와 <b>가입 5년 된 해</b> 중 늦은 쪽</div>
-                  <div>퇴직금을 옮긴 IRP = 가입 기간 요건 없음</div>
-                  <small>수령한도는 계좌마다 따로 계산돼요. 이 가이드는 계좌를 하나로 합쳐서 보니, <b>돈이 가장 많이 든 계좌</b> 기준으로 판단하세요. 2013년 3월 1일 이전 가입 체크도 그 계좌가 해당될 때만 하세요.</small>
+                  <div>퇴직금을 옮긴 IRP = 가입 기간 요건 없음 → 퇴직한 해(<span data-rule="PENSION.minAge">55</span>세 전이면 <span data-rule="PENSION.minAge">55</span>세 해)가 1년차</div>
+                  <small>수령한도는 계좌마다 따로 계산돼요. 이 가이드는 퇴직금을 받은 IRP와 연금저축·IRP(내가 넣은 돈) 두 묶음으로 나눠 봅니다. 연금저축·IRP가 여러 개면 <b>돈이 가장 많이 든 계좌</b>의 가입 연도를 넣고, 2013년 3월 1일 이전 가입 체크도 그 계좌가 해당될 때만 하세요.</small>
                 </div>
               </div>
               <div class="doc-mock">
@@ -859,7 +862,7 @@
                   <tr><td>연금저축</td><td class="r">2014.03.10</td><td class="r">130,000,000</td></tr>
                   <tr class="hlg"><td><b>IRP (퇴직금 이체)</b></td><td class="r"><b>2025.03.02</b></td><td class="r"><b>250,000,000</b></td></tr>
                 </table>
-                <div class="mock-arrow">가장 큰 IRP가 2025년 개설 → 2013년 이전 계좌 <b>없음</b> (체크하지 않음)</div>
+                <div class="mock-arrow">퇴직금 IRP는 따로 계산 · 연금저축 2014년 개설 → 가입 연도 <b>2014</b>, 2013년 이전 계좌 <b>아님</b> (체크하지 않음)</div>
               </div>
             </div>
           </div>
@@ -907,7 +910,8 @@
       </div>
       <div style="margin-top:14px">
         <span class="label">올해 총급여 <span data-rule="PENSION_SAVINGS.creditRateWageLimit/1e4">5,500</span>만원(종합소득금액 <span data-rule="PENSION_SAVINGS.creditRateComprehensiveLimit/1e4">4,500</span>만원)</span>
-        <div class="seg" id="rateSeg"><button type="button" data-rate="16.5" data-rule="PENSION_SAVINGS.creditRateHigh*100" data-rule-attr="data-rate" class="on">이하 (<span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>%)</button><button type="button" data-rate="13.2" data-rule="PENSION_SAVINGS.creditRateLow*100" data-rule-attr="data-rate">초과 (<span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%)</button></div>
+        <div class="seg" id="rateSeg"><button type="button" data-rate="16.5" data-rule="PENSION_SAVINGS.creditRateHigh*100" data-rule-attr="data-rate">이하 (<span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>%)</button><button type="button" data-rate="13.2" data-rule="PENSION_SAVINGS.creditRateLow*100" data-rule-attr="data-rate" class="on">초과 (<span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%)</button></div>
+        <div class="input-hint">고르지 않으면 낮은 쪽 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%로 계산합니다.</div>
       </div>
       <div class="field" style="margin-top:18px"><label class="label" for="fin">일반계좌 연간 배당·이자 (ISA·연금계좌 제외)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="fin" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="fin"></div></div>
       <div class="result" id="r5"></div>
@@ -1012,8 +1016,8 @@
 <li><b>은퇴 때 필요한 돈</b>: 은퇴 후 해마다 모자라는 돈(생활비 − 국민연금)을 수익률로 할인해, 은퇴하는 날 한꺼번에 있어야 할 금액으로 바꾼 값입니다. 진단 금액은 모두 물가를 걷어낸 지금 돈 가치입니다.</li>
 <li><b>부족분을 메우는 방법</b>: 나머지 조건은 그대로 두고 수익률·저축·생활비·은퇴 나이 중 하나만 바꿔, 계획 나이까지 버티는 경계값을 찾았습니다.</li>
 <li><b>소득 공백(2·3단계)</b>: (국민연금 개시 나이 − 은퇴 나이) × 월 생활비 × 12. 여기와 3단계 시점별 비교표는 물가 인상을 넣지 않은 단순 합계입니다.</li>
-<li><b>연금 첫해 인출(4단계)</b>: ① 세액공제 안 받은 원금 → ② 퇴직금 → ③ 세액공제분·수익 순서로 빠진다고 보고, 세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했습니다.</li>
-<li><b>ISA 연금 이전 환급(5단계)</b>: 옮긴 돈의 <span data-rule="PENSION_SAVINGS.isaTransferCreditRate*100">10</span>%(최대 <span data-rule="PENSION_SAVINGS.isaTransferCreditCap/1e4">300</span>만원) × 세액공제율(<span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>% 또는 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%).</li>
+<li><b>연금 첫해 인출(4단계)</b>: ① 세액공제 안 받은 원금 → ② 퇴직금 → ③ 세액공제분·수익 순서로 꺼낸다고 보고, 세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했습니다. 연금수령한도는 퇴직금을 받은 IRP(퇴직한 해부터, <span data-rule="PENSION.minAge">55</span>세 전이면 <span data-rule="PENSION.minAge">55</span>세 해부터)와 연금저축·IRP(<span data-rule="PENSION.minAge">55</span>세와 가입 5년 중 늦은 해부터)를 따로 계산합니다.</li>
+<li><b>ISA 연금 이전 환급(5단계)</b>: 옮긴 돈의 <span data-rule="PENSION_SAVINGS.isaTransferCreditRate*100">10</span>%(최대 <span data-rule="PENSION_SAVINGS.isaTransferCreditCap/1e4">300</span>만원) × 세액공제율(<span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>% 또는 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%). 올해 소득을 받지 않아 기본은 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%이고, 고른 값이 있으면 그 값을 씁니다.</li>
 <li><b>건보료 피부양자(6단계)</b>: 본인·배우자의 판정 소득을 각각 기준선과 비교하고, 사업·임대 소득 요건을 따로 봅니다. 기준은 맨 아래 제도 기준을 따릅니다.</li></ul>
 <h4>계산에 넣지 않은 것</h4>
 <ul><li>최종 진단에는 세금·건보료가 빠져 있습니다. 실제로 쓸 수 있는 돈은 이보다 조금 적습니다.</li>
@@ -1415,6 +1419,7 @@ const PF = (() => {
 const TR = TTOKJAE_RULES;
 const pctNum = r => +(r * 100).toFixed(10);                     // 비율 → % 숫자 (0.055 → 5.5)
 const MIN_AGE = TR.PENSION.minAge;                               // 연금으로 꺼낼 수 있는 나이 55세
+const JOIN_YEARS = 5;   // rules-ok: 연금수령 요건 '가입 5년'(소득세법 시행령 제40조의2③) — rules v2026.2에 키가 없어(PENSION.minAge 주석에만 있음) 여기 둠. 다음 rules 버전에 키가 생기면 옮길 것
 const SEP_MAN = TR.PENSION.separateLimit / 1e4;                  // 사적연금 저율 분리과세 기준 1,500만원
 const T_SEP = comma(SEP_MAN);                                    // '1,500'
 const T_SEPR = pctNum(TR.PENSION.separateRate) + '%';            // '16.5%' 1,500만원 초과 시 선택 분리과세
@@ -1431,7 +1436,7 @@ const NH_FIN_MAN = TR.NHIS.finIncomeThreshold / 1e4;             // 건보료 �
 const FIN_TAX_MAN = TR.FIN_INCOME.threshold / 1e4;               // 금융소득종합과세 2,000만원
 const ISA_CAP_MAN = PSV.isaTransferCreditCap / 1e4;              // ISA 이전 추가공제 대상 한도 300만원
 const ISA_MOVE_MAN = PSV.isaTransferCreditCap / PSV.isaTransferCreditRate / 1e4;   // 그 한도를 다 채우는 이전액 3,000만원 (입력 기본값)
-const CREDIT_PCT = pctNum(PSV.creditRateHigh);                   // 세액공제율 기본 선택 16.5(%)
+const CREDIT_PCT = pctNum(PSV.creditRateLow);                    // 세액공제율 기본 선택 13.2(%) — 올해 총급여·종합소득을 받지 않으므로 낮은 쪽. 직접 고르면 그 값
 function npsStartAge(by) { const T = NPSR.startAgeByBirthYear; for (let i = 0; i < T.length - 1; i++) if (by <= T[i][0]) return T[i][1]; return T[T.length - 1][1]; }
 function npsFactor(shift) { return shift < 0 ? 1 + NPSR.earlyReductionPerYear * shift : 1 + NPSR.deferralBonusPerYear * shift; }
 function ageRate(age) { for (let i = 0; i < RBA.length - 1; i++) if (age < RBA[i][0]) return pctNum(RBA[i][1]); return pctNum(RBA[RBA.length - 1][1]); }
@@ -1470,50 +1475,78 @@ function model() {
   const inGap = m.wAge < m.npsStart;
   m.wDefault = Math.round((inGap ? m.living * 12 : Math.max(0, m.living * 12 - m.npsSel * 12)) / 10) * 10;
   m.wAmt = has('wAmt') ? num('wAmt') : m.wDefault;
-  /* 연금수령연차: 수령 요건(55세·가입 5년)을 채운 해가 1년차(2013년 3월 이전 가입 계좌는 6년차) — 소득세법 시행령 제40조의2.
-     가입 시기를 받지 않으므로 55세에 요건을 채웠다고 보고 센다 (pension-tax-sim과 같은 방식: 연차 = 시작 연차 + (인출 나이 − 요건 나이)) */
-  m.year1 = ($('oldAcct').checked ? PEN.pre2013StartYear : 1) + Math.max(0, m.wAge - MIN_AGE);
-  m.limit = m.year1 >= PEN.payoutLimitFreeYear ? Infinity : m.pensionTotal / (PEN.payoutLimitFreeYear - m.year1) * PEN.payoutLimitFactor;
+  /* 연금수령연차: 계좌마다 '최초로 연금수령할 수 있는 날이 속하는 해'가 1년차 — 소득세법 시행령 제40조의2
+     (이연퇴직소득이 있는 계좌는 가입 5년 요건 없음, 2013년 3월 이전 가입 계좌는 6년차부터). 연차 = 시작 연차 + (인출 나이 − 요건 나이)
+     · 퇴직금(②)을 받은 IRP: 퇴직 때 만든 계좌로 보고 max(55, 은퇴 나이) 해가 1년차
+     · 연금저축·IRP(①·③): max(55세 해, 가입 연도 + 5년) 해가 1년차. 가입 연도를 비우면 가입 5년을 채웠다고 봄. 2013년 이전 가입 체크는 이 계좌에만 */
+  m.joinYear = has('joinYear') ? Math.round(num('joinYear')) : null;
+  m.pre2013 = $('oldAcct').checked;
+  m.eligR = Math.max(MIN_AGE, m.retireAge);                                                          // 퇴직금 IRP
+  m.eligAge = m.joinYear ? Math.max(MIN_AGE, m.joinYear + JOIN_YEARS - m.birth) : MIN_AGE;   // 연금저축·IRP
+  m.yearR = 1 + Math.max(0, m.wAge - m.eligR);
+  m.yearE = (m.pre2013 ? PEN.pre2013StartYear : 1) + Math.max(0, m.wAge - m.eligAge);
+  const acctLimit = (bal, y) => y >= PEN.payoutLimitFreeYear ? Infinity : bal / (PEN.payoutLimitFreeYear - y) * PEN.payoutLimitFactor;
+  m.hasR = m.retire > 0; m.hasE = m.ps + m.irp > 0;
+  m.limitR = acctLimit(m.retire, m.yearR);
+  m.preElig = m.hasE && m.wAge >= MIN_AGE && m.wAge < m.eligAge;   // 연금저축·IRP가 아직 가입 5년 전 → 이 계좌 인출은 전부 연금외수령(한도 0)
+  m.limitE = m.preElig ? 0 : acctLimit(m.ps + m.irp, m.yearE);
+  const sumLimit = () => m.hasR || m.hasE ? (m.hasR ? m.limitR : 0) + (m.hasE ? m.limitE : 0) : m.limitE;   // 첫해 한도 합계 (잔액 있는 계좌만)
+  m.limit = sumLimit();
   const A = m.noded, B = m.retire, C = Math.max(0, m.ps + m.irp - m.noded);
   m.wa = Math.min(m.wAmt, A); m.wb = Math.min(m.wAmt - m.wa, B); m.wc = Math.min(m.wAmt - m.wa - m.wb, C);
   m.wOver = Math.max(0, m.wAmt - m.wa - m.wb - m.wc);
   m.rate = ageRate(m.wAge);
-  m.wcOut = isFinite(m.limit) ? Math.max(0, m.wc - Math.max(0, m.limit - m.wa - m.wb)) : 0;   // 한도 초과분 = 연금외수령
+  /* 한도 초과분 = 연금외수령. ②는 퇴직금 IRP 한도, ①·③은 연금저축·IRP 한도로 따로 판정 (한 계좌 안에서는 ① → ③ 순서로 한도를 씀) */
+  m.overR = m.hasR ? Math.max(0, m.wb - m.limitR) : 0;
+  m.overE = m.hasE ? Math.max(0, m.wa + m.wc - m.limitE) : 0;
+  m.wcOut = Math.min(m.wc, m.overE);
   m.wcIn = m.wc - m.wcOut;
   m.cOk = m.wcIn <= SEP_MAN;
 
-  /* 엔진 계산 (첫해) — 단위: 원 → 만원 */
+  /* 엔진 계산 (첫해) — 단위: 원 → 만원. 계좌마다 따로 불러 더함 (세금은 ② 퇴직소득세 · ③ 연금소득세 · 한도 초과 기타소득세로 계좌별로 나뉨) */
   m.other = num('other');   // 6단계 근로·기타소득 (만원/년) → 다른 종합소득으로 세금 계산에 포함
   m.retYears = has('retYears') ? clamp(num('retYears'), 1, 50) : 20;
-  m.eligAge = MIN_AGE;   // 연금 받을 자격이 생긴 나이 = 55세 가정 (위 m.year1 주석)
   m.engine = null;
   m.engineMissing = typeof simulate !== 'function';   // 퇴직소득세는 calc-v1(RC_CALC)로 직접 계산
   if (!m.engineMissing && m.wAge >= MIN_AGE && m.pensionTotal > 0 && m.wAmt > 0) {
     try {
       const W = 10000;
       const retTaxNat = RC_CALC.retirementTax.calc(m.retire * W, m.retYears).national;
-      const res = simulate({
-        startAge: m.wAge, eligAge: m.eligAge, pre2013: $('oldAcct').checked,
-        b1: A * W, b2: B * W, retTaxNat, b3: C * W, r: 0,
-        mode: 'amount', amount: m.wAmt * W, years: 1, desired: 0, phase1Amount: 0, capAmount: 0,
+      const run = (b1, b2, b3, amount, eligAge, pre2013) => simulate({
+        startAge: m.wAge, eligAge, pre2013,
+        b1: b1 * W, b2: b2 * W, retTaxNat: b2 > 0 ? retTaxNat : 0, b3: b3 * W, r: 0,
+        mode: 'amount', amount: amount * W, years: 1, desired: 0, phase1Amount: 0, capAmount: 0,
         publicPension: m.npsSel * 12 * W, publicStartAge: m.npsStart, otherIncome: m.other * W, maxAge: 100,
-      });
-      const row = res.rows[0];
-      if (row) {
+      }).rows[0];
+      const rowR = B > 0 ? run(0, B, 0, m.wb, m.eligR, false) : null;
+      const outRow = amt => {   // 요건 전 연금저축·IRP: ①은 세금 없음, ③은 기타소득세 (엔진은 요건 전 인출을 따로 다루지 않음)
+        const t1 = Math.min(A, amt), t3 = Math.min(C, amt - t1), tOth = t3 * W * PEN.otherIncomeRate;
+        return { from1: t1 * W, from2: 0, from3: t3 * W, p3: 0, taxRetire: 0, taxPension: 0, taxOther: tOth, tax: tOth, net: (t1 + t3) * W - tOth, method: '-', limit: 0, limitYear: m.yearE, w: (t1 + t3) * W };
+      };
+      const rowE = A + C > 0 ? (m.preElig ? outRow(m.wa + m.wc) : run(A, 0, C, m.wa + m.wc, m.eligAge, m.pre2013)) : null;
+      if (rowR || rowE) {
+        const g = (row, k) => row ? row[k] / W : 0;
+        const sumOf = k => g(rowR, k) + g(rowE, k);
         m.engine = {
-          limit: row.limit / W, from1: row.from1 / W, from2: row.from2 / W, from3: row.from3 / W, p3: row.p3 / W,
-          taxRetire: row.taxRetire / W, taxPension: row.taxPension / W, taxOther: row.taxOther / W,
-          tax: row.tax / W, net: row.net / W, method: row.method, limitYear: row.limitYear,
+          from1: sumOf('from1'), from2: sumOf('from2'), from3: sumOf('from3'), p3: sumOf('p3'),
+          taxRetire: sumOf('taxRetire'), taxPension: sumOf('taxPension'), taxOther: sumOf('taxOther'),
+          tax: sumOf('tax'), net: sumOf('net'), method: rowE ? rowE.method : '-',
         };
         const e = m.engine;
-        m.limit = e.limit; m.year1 = e.limitYear;
+        if (rowR) { m.limitR = rowR.limit / W; m.yearR = rowR.limitYear; }
+        if (rowE) { m.limitE = rowE.limit / W; m.yearE = rowE.limitYear; }
+        m.limit = sumLimit();
         m.wa = e.from1; m.wb = e.from2; m.wc = e.from3;
         m.wOver = Math.max(0, m.wAmt - e.from1 - e.from2 - e.from3);
+        m.overR = rowR ? Math.max(0, rowR.w - rowR.limit) / W : 0;
+        m.overE = rowE ? Math.max(0, rowE.w - rowE.limit) / W : 0;
         m.wcIn = e.p3; m.wcOut = Math.max(0, e.from3 - e.p3);
         m.cOk = m.wcIn <= SEP_MAN;
       }
     } catch (err) { m.engine = null; }
   }
+  /* 첫해 한도 초과(연금외수령) 합계 — 계좌가 둘이면 계좌별 초과의 합, 하나면 (인출 계획 − 한도) */
+  m.limitOver = m.hasR && m.hasE ? m.overR + m.overE : Math.max(0, m.wAmt - m.limit);
 
   /* 부자지수 (참고용): 순자산 × 10 ÷ (나이 × 세전 연소득) */
   m.wiInc = num('wiInc'); m.wiEtc = num('wiEtc'); m.wiDebt = num('wiDebt');
@@ -1653,7 +1686,7 @@ function render3(m) {
     }
     return null;
   };
-  const table = rows.map(([sh, nm]) => { const f = npsFactor(sh), st = m.npsStart0 + sh, mo = m.nps * f; return `<tr class="${sh === s ? 'sel' : ''}"><td><b class="when-nm">${nm}</b><span class="when-y">${m.birth + st}년 (${st}세)</span></td><td>월 ${fmtMan(mo)}</td><td>${fmtMan(total(mo, st, 80))}</td><td>${fmtMan(total(mo, st, 90))}</td></tr>`; }).join('');
+  const table = rows.map(([sh, nm]) => { const f = npsFactor(sh), st = m.npsStart0 + sh, mo = m.nps * f; return `<tr class="${sh === s ? 'sel' : ''}"><td><b class="when-nm">${nm}</b><span class="when-y">${m.birth + st}년 (${st}세)</span></td><td>월 ${fmtMan(mo)}</td><td>${fmtMan(total(mo, st, 80 + 1))}</td><td>${fmtMan(total(mo, st, 90 + 1))}</td></tr>`; }).join('');   // 80·90세 해까지 포함 (total(…, age)는 age세 전까지 합 → +1)
   let cross = '';
   if (m.nps > 0) {
     const say = sh => {
@@ -1680,7 +1713,7 @@ function render3(m) {
       <div class="hbar-row"><span>ISA + 일반계좌</span><div class="hbar-track"><div class="hbar-fill" style="width:${m.bridge / maxBar * 100}%;background:var(--brown)"></div></div><span class="amt">${fmtMan(m.bridge)}</span></div>
     </div>
     ${v}${pre}
-    ${m.nps > 0 ? `${viewSeg}<table class="mini" style="margin-top:12px"><thead><tr><th>받는 시점</th><th>월 수령액</th><th>80세까지 누적</th><th>90세까지 누적</th></tr></thead><tbody>${table}</tbody></table><div class="verdict" style="margin-top:12px">${cross}</div><p class="note">${viewNote} 당겨 받기는 가입기간 ${NPSR.minMonths / 12}년 이상 등 조건이 있고, 감액률은 평생 고정됩니다.</p>` : '<p class="note">1단계에 국민연금 예상 월액을 넣으면 시점별 비교표가 나옵니다.</p>'}`;
+    ${m.nps > 0 ? `${viewSeg}<table class="mini" style="margin-top:12px"><thead><tr><th>받는 시점</th><th>월 수령액</th><th>80세까지 누적</th><th>90세까지 누적</th></tr></thead><tbody>${table}</tbody></table><div class="verdict" style="margin-top:12px">${cross}</div><p class="note">누적액은 받기 시작한 해부터 80세·90세 해까지(그 나이 해 포함) 받은 돈을 더했습니다. ${viewNote} 당겨 받기는 가입기간 ${NPSR.minMonths / 12}년 이상 등 조건이 있고, 감액률은 평생 고정됩니다.</p>` : '<p class="note">1단계에 국민연금 예상 월액을 넣으면 시점별 비교표가 나옵니다.</p>'}`;
   /* 사용자가 실제로 입력한 값만 넘긴다 — 빈칸을 0으로 보내면 계산기 기본값이 지워짐 */
   const q3 = new URLSearchParams({ from: 'guide' });
   if (has('living')) q3.set('target-monthly', Math.round(m.living));
@@ -1764,10 +1797,19 @@ function splitBlock(m) {
       <div><b class="h">아직 넣는 중이라면</b>세액공제 한도(연금저축 ${comma(PSV.creditLimitPensionSavings / 1e4)}만원, IRP 합산 ${comma(PSV.creditLimitTotal / 1e4)}만원)를 넘겨 넣을 돈은 <b>별도 연금저축 계좌</b>에, 퇴직금은 <b>새 IRP</b>로 받으세요.</div>
       <div><b class="h">이미 한 계좌에 섞여 있다면</b>개시 전에 연금저축에서 ① 금액만큼만 빼면 세금이 없습니다(금융회사에 '과세제외금액'으로 등록돼 있어야 함). 이 돈은 예금·ISA에 두고 보충용으로 쓰세요. IRP는 법정 사유가 있어야 일부 인출이 됩니다.</div>
     </div>
-    <p class="note">계좌 나누기 표는 은퇴 후 수익률 ${m.rr}%(1단계 운용 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 수령한도는 계좌를 하나로 합쳐 본 근사치라 실제로는 계좌마다 따로 계산되고, 퇴직금 감면 연차는 ②를 실제로 받은 해만 셉니다.</p>
+    <p class="note">계좌 나누기 표는 은퇴 후 수익률 ${m.rr}%(1단계 운용 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 수령한도는 계좌를 하나로 합쳐 연금저축·IRP 연차로 본 근사치라 실제로는 계좌마다 따로 계산되고(퇴직금 IRP는 연차가 늦게 시작해 한도가 더 작음), 퇴직금 감면 연차는 ②를 실제로 받은 해만 셉니다.</p>
   </div>`;
 }
 
+/* 첫해 연금수령한도 — 퇴직금 IRP와 연금저축·IRP는 한도를 따로 계산 */
+const limFmt = v => isFinite(v) ? fmtMan(v) : '한도 없음';
+function limParts(m) {
+  const p = [];
+  if (m.hasR) p.push({ nm: '퇴직금 IRP', v: m.limitR, y: m.yearR, over: m.overR, take: m.wb });
+  if (m.hasE) p.push({ nm: '연금저축·IRP', v: m.limitE, y: m.yearE, over: m.overE, take: m.wa + m.wc, pre: m.preElig });
+  return p;
+}
+function limText(m) { const p = limParts(m); return p.length > 1 ? p.map(x => `${x.nm} ${limFmt(x.v)}`).join(' · ') : limFmt(m.limit); }
 function render4(m) {
   $('wAmt').placeholder = comma(m.wDefault); $('wAge').placeholder = Math.max(MIN_AGE, m.retireAge);
   $('wAmtHint').textContent = `비워두면 ${m.wAge < m.npsStart ? '공백기 생활비 전액' : '생활비에서 국민연금을 뺀 금액'} ${fmtMan(m.wDefault)}으로 계산합니다.`;
@@ -1776,7 +1818,11 @@ function render4(m) {
   const seg = (v, c, t) => v > 0 ? `<div class="hbar-fill" style="width:${v / tot * 100}%;background:${c}" title="${t}"></div>` : '';
   let verdicts = '';
   if (m.wAge < MIN_AGE) verdicts += `<div class="verdict bad">${MIN_AGE}세 전에 꺼내면 '연금수령'이 아니어서 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}, 퇴직금은 감면 없이 과세됩니다.</div>`;
-  if (m.wAmt > m.limit) verdicts += `<div class="verdict bad">첫해 인출 계획이 연금수령한도 <b>${lim}</b>을 넘습니다. 넘는 <b>${fmtMan(m.wAmt - m.limit)}</b>은 '연금외수령'으로 저율 과세와 퇴직소득세 감면을 받지 못합니다.</div>`;
+  const parts = limParts(m);
+  if (m.preElig && m.wa + m.wc > 0) verdicts += `<div class="verdict bad">연금저축·IRP는 가입 ${JOIN_YEARS}년을 채운 ${m.eligAge}세 해(${m.birth + m.eligAge}년)부터 연금으로 받을 수 있습니다. ${m.wAge}세에 이 계좌에서 꺼내는 ${fmtMan(m.wa + m.wc)}은 '연금외수령'이라 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}입니다.</div>`;
+  if (m.limitOver > 0) verdicts += parts.length > 1
+    ? `<div class="verdict bad">첫해 인출 계획이 연금수령한도를 넘습니다. 한도는 계좌마다 따로라, ${parts.filter(x => x.over > 0).map(x => `${x.nm}에서 꺼내는 ${fmtMan(x.take)}이 이 계좌 한도 <b>${limFmt(x.v)}</b>보다 ${fmtMan(x.over)} 많습니다`).join(', ')}. 넘는 <b>${fmtMan(m.limitOver)}</b>은 '연금외수령'으로 저율 과세와 퇴직소득세 감면을 받지 못합니다.${parts.filter(x => x.over <= 0 && x.v - x.take > 0.5).map(x => ` ${x.nm}는 한도가 ${isFinite(x.v) ? `${fmtMan(x.v - x.take)} 남으니` : '없으니'}, 넘는 몫을 이 계좌에서 꺼낼 때와 세금을 비교해 보세요.`).join('')}</div>`
+    : `<div class="verdict bad">첫해 인출 계획이 연금수령한도 <b>${lim}</b>을 넘습니다. 넘는 <b>${fmtMan(m.limitOver)}</b>은 '연금외수령'으로 저율 과세와 퇴직소득세 감면을 받지 못합니다.</div>`;
   if (m.wOver > 0) verdicts += `<div class="verdict warn">연금계좌 잔액보다 <b>${fmtMan(m.wOver)}</b> 많이 꺼내는 계획입니다.</div>`;
   const e = m.engine;
   if (m.wcIn === 0) verdicts += `<div class="verdict ok">첫해에는 세금 없는 원금과 퇴직금만 꺼내서 연 ${T_SEP}만원 판정 대상이 없습니다. 세액공제 받은 원금·수익은 뒤로 미뤄 두고, 꺼낼 때 1년에 ${T_SEP}만원 이하로 나누면 됩니다.</div>`;
@@ -1792,10 +1838,12 @@ function render4(m) {
   $('r4').innerHTML = `
     <div class="stat-grid">
       ${stat('연금계좌 평가액', fmtMan(m.pensionTotal), '퇴직금 + 연금저축 + IRP')}
-      ${stat('첫해 연금수령한도', lim, isFinite(m.limit) ? `평가액 ÷ (${PEN.payoutLimitFreeYear} − ${m.year1}) × ${pctNum(PEN.payoutLimitFactor)}%` : `${PEN.payoutLimitFreeYear}년차 이후`, true)}
+      ${parts.length > 1
+        ? stat('첫해 연금수령한도', isFinite(m.limit) ? fmtMan(m.limit) : parts.every(x => !isFinite(x.v)) ? '한도 없음' : '일부 한도 없음', parts.map(x => `${x.nm} ${limFmt(x.v)}(${x.pre ? `${m.eligAge}세부터` : `${x.y}년차`})`).join(' + '), true)
+        : stat('첫해 연금수령한도', lim, m.preElig && !m.hasR ? `${m.eligAge}세 해부터 연금수령` : isFinite(m.limit) ? `평가액 ÷ (${PEN.payoutLimitFreeYear} − ${m.hasR ? m.yearR : m.yearE}) × ${pctNum(PEN.payoutLimitFactor)}%` : `${PEN.payoutLimitFreeYear}년차 이후`, true)}
       ${stat(`${T_SEP}만원 판정 대상`, fmtMan(m.wcIn), m.wcOut > 0 ? `한도 초과 ${fmtMan(m.wcOut)}은 기타소득세 ${T_OTHR}` : '세액공제 받은 원금 + 운용수익 인출')}
     </div>
-    <div style="margin-top:20px"><span class="label">한 계좌에 섞여 있으면, 첫해 ${fmtMan(m.wAmt)}은 ① → ② → ③ 순서로만 빠집니다</span>
+    <div style="margin-top:20px"><span class="label">첫해 ${fmtMan(m.wAmt)}은 ① → ② → ③ 순서로 꺼낸다고 봅니다 (②는 퇴직금을 받은 IRP, ①·③은 연금저축·IRP)</span>
       <div class="hbar-track" style="height:28px;margin-top:6px">${seg(m.wa, '#C4A57B', '세액공제 받지 않은 원금')}${seg(m.wb, '#8B6F47', '퇴직금')}${seg(m.wc, '#D9542B', '세액공제 받은 원금·수익')}${seg(m.wOver, '#C4B8A3', '잔액 초과')}</div>
       <div class="legend" style="margin-top:12px">${[
         ['① 세액공제 받지 않은 원금', '세금 없음', m.wa, '#C4A57B', '#3A2F26'],
@@ -1806,7 +1854,7 @@ function render4(m) {
     ${verdicts}
     ${taxBlock}
     ${splitBlock(m)}
-    <p class="note">첫해 표는 첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로 보고, ${m.other > 0 ? `6단계 근로·기타소득 ${fmtMan(m.other)}을 다른 종합소득으로 넣었습니다` : '다른 종합소득은 없는 것으로 가정했습니다'}. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}연금수령연차는 가입 시기를 받지 않아 <b>${MIN_AGE}세에 수령 요건(${MIN_AGE}세·가입 5년)을 채웠다고 보고</b> 셉니다(${m.wAge >= MIN_AGE ? `${m.wAge}세 = ${m.year1}년차` : `${MIN_AGE}세 = ${$('oldAcct').checked ? PEN.pre2013StartYear : 1}년차`}). ${MIN_AGE}세 이후에 만들었거나 가입 5년이 안 된 계좌, 퇴직 때 새로 만든 IRP는 연차가 그만큼 늦게 시작해 한도가 더 작습니다. 퇴직금 감면은 ${PPR[0][0] + 1}~${PPR[1][0]}년차 ${T_CUT[1]}, ${PPR[1][0]}년 초과 ${T_CUT[2]}로 커집니다. 연 ${T_SEP}만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 계좌마다 다른 수령한도·감면 연차까지 여러 해로 자세히 보려면 시뮬레이터에서 확인하세요.</p>`;
+    <p class="note">첫해 표는 첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로 보고, ${m.other > 0 ? `6단계 근로·기타소득 ${fmtMan(m.other)}을 다른 종합소득으로 넣었습니다` : '다른 종합소득은 없는 것으로 가정했습니다'}. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}연금수령연차는 계좌마다 따로 셉니다. <b>퇴직금을 받은 IRP</b>는 퇴직 때 만든 계좌로 보고 ${m.eligR}세 해(퇴직한 해, ${MIN_AGE}세 전이면 ${MIN_AGE}세 해)가 1년차, <b>연금저축·IRP</b>는 ${m.joinYear ? `${MIN_AGE}세 해와 가입 ${m.joinYear}년 + ${JOIN_YEARS}년 중 늦은 ${m.eligAge}세 해` : `가입 ${JOIN_YEARS}년을 이미 채웠다고 보고 ${MIN_AGE}세 해`}가 1년차${m.pre2013 ? `(2013년 3월 이전 가입이라 ${PEN.pre2013StartYear}년차부터)` : ''}입니다${m.wAge >= MIN_AGE ? `(${m.wAge}세 = ${[m.hasR ? `퇴직금 IRP ${m.yearR}년차` : '', m.hasE || !m.hasR ? `연금저축·IRP ${m.preElig ? '요건 전' : `${m.yearE}년차`}` : ''].filter(Boolean).join(' · ')})` : ''}. 연금저축·IRP를 ${MIN_AGE}세 이후에 만들었거나 가입 ${JOIN_YEARS}년이 안 됐다면 가입 연도를 넣으세요. 퇴직금 감면은 ${PPR[0][0] + 1}~${PPR[1][0]}년차 ${T_CUT[1]}, ${PPR[1][0]}년 초과 ${T_CUT[2]}로 커집니다. 연 ${T_SEP}만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 계좌마다 다른 수령한도·감면 연차까지 여러 해로 자세히 보려면 시뮬레이터에서 확인하세요.</p>`;
   const q4 = new URLSearchParams({ from: 'guide' });
   if (['retire', 'ps', 'irp', 'noded'].some(has)) {          // 연금계좌 금액을 하나라도 넣었으면 세 계좌 금액을 함께 넘김
     q4.set('b1', Math.round(m.noded)); q4.set('b2', Math.round(m.retire)); q4.set('b3', Math.round(Math.max(0, m.ps + m.irp - m.noded)));
@@ -2004,7 +2052,7 @@ function renderDiag(m) {
   }
   const leaks = [];
   if (m.engine && !m.cOk) leaks.push(`연금 세액공제 받은 원금·수익을 1년에 <b>${fmtMan(m.wcIn)}</b> 꺼내 연 ${T_SEP}만원 선을 넘습니다. 계좌를 나누면 세금이 줄어듭니다 (4단계).`);
-  if (m.wAmt > m.limit) leaks.push(`첫해 인출이 연금수령한도를 넘어 <b>${fmtMan(m.wAmt - m.limit)}</b>은 높은 세율로 과세됩니다 (4단계).`);
+  if (m.limitOver > 0) leaks.push(`첫해 인출이 연금수령한도를 넘어 <b>${fmtMan(m.limitOver)}</b>은 높은 세율로 과세됩니다 (4단계).`);
   if (m.isaMove > 0) leaks.push(`ISA 만기 자금을 연금으로 옮기면 환급 <b>약 ${fmtMan(m.isaRefund)}</b> — 놓치면 그대로 사라집니다 (5단계).`);
   if (m.fin > NH_FIN_MAN) leaks.push(`일반계좌 금융소득 <b>${fmtMan(m.fin)}</b>이 ${comma(NH_FIN_MAN)}만원을 넘어 건보료 판정 소득에 전액 잡힙니다 (5·6단계).`);
   if (m.hi !== 'ok') leaks.push(`건보료 피부양자에서 ${m.hi === 'bad' ? '빠질 수 있습니다' : '빠지기 직전입니다'}. 지역가입자가 되면 보험료가 따로 나갑니다 (6단계).`);
@@ -2024,8 +2072,8 @@ function renderSummary(m) {
   $('sumDate').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 작성 · ${m.birth}년생 · ${m.retireAge}세 은퇴 기준`;
   const flag = (k, t) => `<span class="flag ${k}">${t}</span>`;
   const short = Math.max(0, m.gapNeed - m.bridge);
-  const lim = isFinite(m.limit) ? fmtMan(m.limit) : '한도 없음';
-  const c4 = (m.wAmt > m.limit || m.wAge < MIN_AGE) ? 'bad' : (m.cOk ? 'ok' : 'warn');
+  const lim = limText(m);
+  const c4 = (m.limitOver > 0 || m.wAge < MIN_AGE) ? 'bad' : (m.cOk ? 'ok' : 'warn');
   const cards = [
     ['노후 자산', `${fmtMan(m.total)}`, `연금계좌 ${pct(m.total ? m.pensionTotal / m.total * 100 : 0)} · ISA·일반 ${fmtMan(m.bridge)}`, ''],
     ['소득 공백', `${m.gap}년 · ${fmtMan(m.gapNeed)}`, short > 0 ? `ISA·일반으로 ${fmtMan(short)} 부족` : 'ISA·일반으로 충당 가능', m.gap === 0 || short === 0 ? flag('ok', '충분') : flag('warn', '⚠️ 부족')],
@@ -2087,7 +2135,7 @@ function renderAll() {
 }
 
 /* ===== 이벤트 ===== */
-const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'bizInc', 'spBizInc', 'biz', 'spBiz', 'rr', 'rrPre', 'inf', 'endAge', 'save'];
+const FIELDS = ['retire', 'ps', 'irp', 'isa', 'gen', 'nps', 'noded', 'prop', 'wiInc', 'wiAge', 'wiEtc', 'wiDebt', 'birth', 'retireAge', 'living', 'shift', 'wAge', 'wAmt', 'retYears', 'joinYear', 'oldAcct', 'isaDate', 'isaMove', 'fin', 'other', 'spNps', 'spFin', 'bizInc', 'spBizInc', 'biz', 'spBiz', 'rr', 'rrPre', 'inf', 'endAge', 'save'];
 function restore() {
   FIELDS.forEach(id => { const el = $(id); if (!el || !(id in S.v)) return; if (el.type === 'checkbox') el.checked = !!S.v[id]; else el.value = S.v[id]; });
 }
@@ -2188,7 +2236,7 @@ function resultText() {
   }
   const short = Math.max(0, m.gapNeed - m.bridge);
   L.push(`노후 자산 ${fmtMan(m.total)} (연금계좌 ${pct(m.total ? m.pensionTotal / m.total * 100 : 0)}) · 소득 공백 ${m.gap}년${m.gap === 0 ? '' : short > 0 ? `, ISA·일반으로 ${fmtMan(short)} 부족` : ', ISA·일반으로 충당 가능'}`);
-  const lim = isFinite(m.limit) ? fmtMan(m.limit) : '한도 없음';
+  const lim = limText(m);
   L.push(`국민연금 ${m.npsStart}세부터 ${m.nps ? '월 ' + fmtMan(m.npsSel) : '(예상액 미입력)'} · 연금 첫해 인출 ${fmtMan(m.wAmt)} (한도 ${lim}${m.engine ? `, 세금 약 ${fmtMan(m.engine.tax)}` : ''}${m.cOk ? '' : `, ${T_SEP}만원 초과`})`);
   L.push(`ISA→연금 이전 환급 약 ${fmtMan(m.isaRefund)} · 건보료 피부양자 ${m.hi === 'ok' ? '유지' : m.hi === 'warn' ? '경계' : '제외 가능'} (본인 판정 소득 ${fmtMan(m.myInc)})`);
   L.push(location.href.split(/[?#]/)[0]);
