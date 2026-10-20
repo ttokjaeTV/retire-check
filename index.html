@@ -693,7 +693,7 @@
         </div>
         <div class="grid-3" style="margin-top:14px">
           <div class="field"><label class="label" for="inf">물가상승률 (연)</label><div class="input-wrap"><input type="number" id="inf" step="0.5" min="0" max="10" placeholder="2.5"><span class="unit">%</span></div><div class="input-hint">한국은행 물가안정목표는 2%입니다.</div></div> <!-- rules-ok: 물가 가정 기본값(제도 아님) -->
-          <div class="field"><label class="label" for="endAge">몇 세까지 계획</label><div class="input-wrap"><input type="number" id="endAge" min="70" max="110" placeholder="90"><span class="unit">세</span></div><div class="input-hint">60세 은퇴, 90세까지면 30년</div></div>
+          <div class="field"><label class="label" for="endAge">몇 세까지 계획</label><div class="input-wrap"><input type="number" id="endAge" min="70" max="110" placeholder="90"><span class="unit">세</span></div><div class="input-hint">60세 은퇴, 90세까지면 31년 (90세 해 포함)</div></div>
           <div class="field"><label class="label" for="save">은퇴 전까지 월 저축</label><div class="input-wrap"><input type="text" inputmode="numeric" id="save" data-money placeholder="0"><span class="unit">만원</span></div></div>
         </div>
         <p class="note" style="margin-top:12px" id="pfDataNote"></p>
@@ -1463,7 +1463,9 @@ function model() {
   const inGap = m.wAge < m.npsStart;
   m.wDefault = Math.round((inGap ? m.living * 12 : Math.max(0, m.living * 12 - m.npsSel * 12)) / 10) * 10;
   m.wAmt = has('wAmt') ? num('wAmt') : m.wDefault;
-  m.year1 = $('oldAcct').checked ? PEN.pre2013StartYear : 1;
+  /* 연금수령연차: 수령 요건(55세·가입 5년)을 채운 해가 1년차(2013년 3월 이전 가입 계좌는 6년차) — 소득세법 시행령 제40조의2.
+     가입 시기를 받지 않으므로 55세에 요건을 채웠다고 보고 센다 (pension-tax-sim과 같은 방식: 연차 = 시작 연차 + (인출 나이 − 요건 나이)) */
+  m.year1 = ($('oldAcct').checked ? PEN.pre2013StartYear : 1) + Math.max(0, m.wAge - MIN_AGE);
   m.limit = m.year1 >= PEN.payoutLimitFreeYear ? Infinity : m.pensionTotal / (PEN.payoutLimitFreeYear - m.year1) * PEN.payoutLimitFactor;
   const A = m.noded, B = m.retire, C = Math.max(0, m.ps + m.irp - m.noded);
   m.wa = Math.min(m.wAmt, A); m.wb = Math.min(m.wAmt - m.wa, B); m.wc = Math.min(m.wAmt - m.wa - m.wb, C);
@@ -1476,7 +1478,7 @@ function model() {
   /* 엔진 계산 (첫해) — 단위: 원 → 만원 */
   m.other = num('other');   // 6단계 근로·기타소득 (만원/년) → 다른 종합소득으로 세금 계산에 포함
   m.retYears = has('retYears') ? clamp(num('retYears'), 1, 50) : 20;
-  m.eligAge = Math.min(m.wAge, Math.max(MIN_AGE, m.retireAge));
+  m.eligAge = MIN_AGE;   // 연금 받을 자격이 생긴 나이 = 55세 가정 (위 m.year1 주석)
   m.engine = null;
   m.engineMissing = typeof simulate !== 'function' || typeof retirementTax !== 'function';
   if (!m.engineMissing && m.wAge >= MIN_AGE && m.pensionTotal > 0 && m.wAmt > 0) {
@@ -1680,7 +1682,7 @@ function render3(m) {
   if (['retire', 'ps', 'irp', 'isa', 'gen'].some(has)) q3.set('current-assets', Math.round(m.total));
   if (has('save')) q3.set('monthly-saving', Math.round(m.save));
   if (has('inf')) q3.set('inflation', m.inf);
-  q3.set('retire-years', Math.max(1, m.endAge - Math.max(Math.max(40, m.retireAge), clamp(new Date().getFullYear() - m.birth, 20, 85))));   // 은퇴 기간 = 계획 나이 − 은퇴 나이
+  q3.set('retire-years', Math.max(1, m.endAge - Math.max(Math.max(40, m.retireAge), clamp(new Date().getFullYear() - m.birth, 20, 85)) + 1));   // 은퇴 기간 = 계획 나이 − 은퇴 나이 + 1 (계획 나이 해까지 포함)
   /* 세후 수익률을 배당률(최대 2.5%) + 주가성장률로 나누고 배당성장률 = 주가성장률 → 역산 계산기 인출기 총수익률도 이 값 그대로 */
   const dy = clamp(m.rr, 0, 2.5), pa = m.rr - dy;
   q3.set('dividend-yield', Math.round(dy * 100) / 100);
@@ -1755,7 +1757,7 @@ function splitBlock(m) {
       <div><b class="h">아직 넣는 중이라면</b>세액공제 한도(연금저축 ${comma(PSV.creditLimitPensionSavings / 1e4)}만원, IRP 합산 ${comma(PSV.creditLimitTotal / 1e4)}만원)를 넘겨 넣을 돈은 <b>별도 연금저축 계좌</b>에, 퇴직금은 <b>새 IRP</b>로 받으세요.</div>
       <div><b class="h">이미 한 계좌에 섞여 있다면</b>개시 전에 연금저축에서 ① 금액만큼만 빼면 세금이 없습니다(금융회사에 '과세제외금액'으로 등록돼 있어야 함). 이 돈은 예금·ISA에 두고 보충용으로 쓰세요. IRP는 법정 사유가 있어야 일부 인출이 됩니다.</div>
     </div>
-    <p class="note">계좌 나누기 표는 은퇴 후 수익률 ${m.rr}%(1단계 운용 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 계좌를 하나로 합쳐 본 근사치라 실제 수령한도·감면 연차는 계좌마다 따로 계산됩니다.</p>
+    <p class="note">계좌 나누기 표는 은퇴 후 수익률 ${m.rr}%(1단계 운용 가정), 매년 같은 금액, 국민연금 ${m.npsStart}세부터 월 ${fmtMan(m.npsSel)}로 100세까지 계산했습니다. 수령한도는 계좌를 하나로 합쳐 본 근사치라 실제로는 계좌마다 따로 계산되고, 퇴직금 감면 연차는 ②를 실제로 받은 해만 셉니다.</p>
   </div>`;
 }
 
@@ -1797,7 +1799,7 @@ function render4(m) {
     ${verdicts}
     ${taxBlock}
     ${splitBlock(m)}
-    <p class="note">첫해 표는 첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로 보고, ${m.other > 0 ? `6단계 근로·기타소득 ${fmtMan(m.other)}을 다른 종합소득으로 넣었습니다` : '다른 종합소득은 없는 것으로 가정했습니다'}. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}퇴직금 감면은 ${PPR[0][0] + 1}~${PPR[1][0]}년차 ${T_CUT[1]}, ${PPR[1][0]}년 초과 ${T_CUT[2]}로 커집니다. 연 ${T_SEP}만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 계좌마다 다른 수령한도·감면 연차까지 여러 해로 자세히 보려면 시뮬레이터에서 확인하세요.</p>`;
+    <p class="note">첫해 표는 첫해만 계산했습니다. ${e ? `세금은 연금 인출 세금 시뮬레이터와 같은 계산 엔진으로 구했고, 퇴직소득세는 근속연수 ${m.retYears}년으로 추정했습니다. 국민연금은 전액 과세 대상으로 보고, ${m.other > 0 ? `6단계 근로·기타소득 ${fmtMan(m.other)}을 다른 종합소득으로 넣었습니다` : '다른 종합소득은 없는 것으로 가정했습니다'}. ` : (m.engineMissing ? '세금 계산 엔진을 불러오지 못해 간이 계산으로 보여드립니다. ' : '')}연금수령연차는 가입 시기를 받지 않아 <b>${MIN_AGE}세에 수령 요건(${MIN_AGE}세·가입 5년)을 채웠다고 보고</b> 셉니다(${m.wAge >= MIN_AGE ? `${m.wAge}세 = ${m.year1}년차` : `${MIN_AGE}세 = ${$('oldAcct').checked ? PEN.pre2013StartYear : 1}년차`}). ${MIN_AGE}세 이후에 만들었거나 가입 5년이 안 된 계좌, 퇴직 때 새로 만든 IRP는 연차가 그만큼 늦게 시작해 한도가 더 작습니다. 퇴직금 감면은 ${PPR[0][0] + 1}~${PPR[1][0]}년차 ${T_CUT[1]}, ${PPR[1][0]}년 초과 ${T_CUT[2]}로 커집니다. 연 ${T_SEP}만원 기준은 부부 합산이 아니라 각자 따로 봅니다. 계좌마다 다른 수령한도·감면 연차까지 여러 해로 자세히 보려면 시뮬레이터에서 확인하세요.</p>`;
   const q4 = new URLSearchParams({ from: 'guide' });
   if (['retire', 'ps', 'irp', 'noded'].some(has)) {          // 연금계좌 금액을 하나라도 넣었으면 세 계좌 금액을 함께 넘김
     q4.set('b1', Math.round(m.noded)); q4.set('b2', Math.round(m.retire)); q4.set('b3', Math.round(Math.max(0, m.ps + m.irp - m.noded)));
@@ -1870,7 +1872,7 @@ function render6(m) {
 
 /* ===== 평생 현금흐름 (만원, 세후 수익률, 세금·건보료는 4·6단계에서 따로) =====
    은퇴 전: 월 복리(월 수익률 = (1+연 수익률)^(1/12) − 1), 월 저축은 매달 말 적립 (다른 똑재TV 계산기와 같은 방식)
-   은퇴 후: 은퇴 기간 N = 계획 나이 − 은퇴 나이. k번째 해(k=1..N) 연초, (은퇴 나이 + k − 1)세에
+   은퇴 후: 은퇴 기간 N = 계획 나이 − 은퇴 나이 + 1 (계획 나이 해까지 포함, retire-drawdown·freedom과 같음). k번째 해(k=1..N) 연초, (은퇴 나이 + k − 1)세에
             (생활비 − 국민연금)을 꺼내고 남은 돈을 굴림. 생활비·국민연금은 물가만큼 오름. */
 function lifeSim(p) {
   const path = []; let A = p.A0, deplete = null, PVneed = 0, Aret = null;
@@ -1879,7 +1881,7 @@ function lifeSim(p) {
   const yearSave = rm === 0 ? p.save * 12 : p.save * (Math.pow(1 + rm, 12) - 1) / rm;   // 매달 말 월 저축 12번의 연말 가치
   for (let a = p.curAge; a < startRet; a++) { path.push({ age: a, A }); A = A * (1 + p.rPre) + yearSave; }
   Aret = A;
-  for (let a = startRet; a < p.endAge; a++) {
+  for (let a = startRet; a <= p.endAge; a++) {
     const g = Math.pow(1 + p.inf, a - p.curAge);
     const w = p.living * 12 * g - (a >= p.npsStart ? p.nps * 12 * g : 0);
     PVneed += Math.max(0, w) / Math.pow(1 + p.rPost, a - startRet);
@@ -1887,7 +1889,7 @@ function lifeSim(p) {
     if (deplete === null && w > 0 && A < w) deplete = a;
     A = (A - w) * (1 + p.rPost);
   }
-  path.push({ age: Math.max(p.endAge, startRet), A: Math.max(0, A) });   // 계획 나이에 남은 돈
+  path.push({ age: Math.max(p.endAge, startRet - 1) + 1, A: Math.max(0, A) });   // 계획 나이 해 말(= 다음 나이 연초)에 남은 돈
   return { path, deplete, Aret, PVneed, endBal: A, startRet };
 }
 const okSim = p => lifeSim(p).deplete === null;
@@ -1895,7 +1897,7 @@ function bisect(f, lo, hi, n = 40) { for (let i = 0; i < n; i++) { const mid = (
 function planBase(m) {
   const curAge = clamp(new Date().getFullYear() - m.birth, 20, 100);
   return { A0: m.total, save: m.save, rPre: m.rrPre / 100, rPost: m.rr / 100, inf: m.inf / 100, curAge, retireAge: m.retireAge,
-    endAge: Math.max(m.endAge, Math.max(m.retireAge, curAge) + 1), living: m.living, nps: m.npsSel, npsStart: m.npsStart };
+    endAge: Math.max(m.endAge, Math.max(m.retireAge, curAge)), living: m.living, nps: m.npsSel, npsStart: m.npsStart };
 }
 function planDiag(m) {
   const b = planBase(m), res = lifeSim(b), ok = res.deplete === null;
@@ -1948,13 +1950,13 @@ function renderDiag(m) {
   const row = (l, r, hl) => `<div class="diag-row${hl ? ' hl' : ''}"><span class="l">${l}</span><span class="r">${r}</span></div>`;
   let head;
   if (d.ok) {
-    const endReal = Math.max(0, d.res.endBal / Math.pow(1 + b.inf, Math.max(b.endAge, d.res.startRet) - b.curAge));   // endBal은 계획 나이 시점 잔액 (차트 끝점과 같은 기준)
+    const endReal = Math.max(0, d.res.endBal / Math.pow(1 + b.inf, Math.max(b.endAge, d.res.startRet - 1) + 1 - b.curAge));   // endBal은 계획 나이 해 말(다음 나이 연초) 잔액 → 그 시점 물가로 환산 (차트 끝점과 같은 기준)
     d.endReal = endReal;
     head = `<div class="diag"><div class="diag-k">최종 진단</div>
       <div class="diag-v">${b.endAge}세까지 <em>버팁니다</em></div>
       <div class="diag-rows">
         ${row('버티는 나이', `${b.endAge}세 이상 <small>목표 달성</small>`)}
-        ${row(`${b.endAge}세에 남는 돈`, fmtMan(endReal), true)}
+        ${row(`${b.endAge}세 말에 남는 돈`, fmtMan(endReal), true)}
         ${row('필요 자산 (평균 수익률 가정)', fmtMan(d.res.PVneed / d.defl))}
         ${row('은퇴 때 예상 자산', fmtMan(d.res.Aret / d.defl))}
       </div>
@@ -1966,7 +1968,7 @@ function renderDiag(m) {
       <div class="diag-v">지금 계획이면 <em>${d.res.deplete}세</em>에 바닥납니다</div>
       <div class="diag-rows">
         ${row('바닥나는 나이', `${d.res.deplete}세 <small>목표 ${b.endAge}세</small>`)}
-        ${row('모자라는 기간', `${b.endAge - d.res.deplete}년`)}
+        ${row('모자라는 기간', `${b.endAge - d.res.deplete + 1}년`)}
         ${row('부족한 돈', fmtMan(shortReal), true)}
         ${row('필요 자산 (평균 수익률 가정)', fmtMan(d.res.PVneed / d.defl))}
         ${row('은퇴 때 예상 자산', fmtMan(d.res.Aret / d.defl))}
@@ -2000,7 +2002,7 @@ function renderDiag(m) {
   if (m.fin > NH_FIN_MAN) leaks.push(`일반계좌 금융소득 <b>${fmtMan(m.fin)}</b>이 ${comma(NH_FIN_MAN)}만원을 넘어 건보료 판정 소득에 전액 잡힙니다 (5·6단계).`);
   if (m.hi !== 'ok') leaks.push(`건보료 피부양자에서 ${m.hi === 'bad' ? '빠질 수 있습니다' : '빠지기 직전입니다'}. 지역가입자가 되면 보험료가 따로 나갑니다 (6단계).`);
   const leakHtml = leaks.length ? `<div class="lever-t">세금·건보료에서 새는 돈</div><ul class="leak">${leaks.map(x => `<li>${x}</li>`).join('')}</ul>` : '';
-  $('diagBox').innerHTML = head + chart + levers + leakHtml + `<p class="note">수익률은 세후로 넣고, 연금소득세·건보료는 4·6단계에서 따로 봅니다. 생활비와 국민연금은 물가만큼 오르고, 자산은 매년 같은 수익률로 굴러간다고(월 복리·매달 말 저축) 가정했습니다. 실제 수익률은 해마다 오르내립니다.<br>필요 자산은 은퇴 나이부터 ${b.endAge}세 전까지 ${Math.max(0, b.endAge - d.res.startRet)}년 동안 꺼내 쓰면 딱 바닥나는 금액입니다. 4% 룰(현금흐름 역산 계산기)은 은퇴 초반 하락장까지 감안한 보수적 기준이라 보통 더 크게 나옵니다(수익률을 아주 낮게 잡으면 반대일 수도 있습니다).</p>`;
+  $('diagBox').innerHTML = head + chart + levers + leakHtml + `<p class="note">수익률은 세후로 넣고, 연금소득세·건보료는 4·6단계에서 따로 봅니다. 생활비와 국민연금은 물가만큼 오르고, 자산은 매년 같은 수익률로 굴러간다고(월 복리·매달 말 저축) 가정했습니다. 실제 수익률은 해마다 오르내립니다.<br>필요 자산은 은퇴 나이부터 ${b.endAge}세 해까지 ${Math.max(0, b.endAge - d.res.startRet + 1)}년 동안 꺼내 쓰면 딱 바닥나는 금액입니다. 4% 룰(현금흐름 역산 계산기)은 은퇴 초반 하락장까지 감안한 보수적 기준이라 보통 더 크게 나옵니다(수익률을 아주 낮게 잡으면 반대일 수도 있습니다).</p>`;
 }
 
 function renderAssumeRead(m) {
@@ -2173,7 +2175,7 @@ function resultText() {
   L.push(`[은퇴 5년 전 점검표] ${m.birth}년생 · ${m.retireAge}세 은퇴 · ${endAge}세까지 계획`);
   if (!d) { L.push('최종 진단: 1단계에 자산을 넣으면 나옵니다'); L.push(location.href.split(/[?#]/)[0]); return L.join('\n'); }
   {
-    L.push(d.ok ? `최종 진단: ${endAge}세까지 버팁니다 · ${endAge}세에 남는 돈 ${fmtMan(d.endReal)}`
+    L.push(d.ok ? `최종 진단: ${endAge}세까지 버팁니다 · ${endAge}세 말에 남는 돈 ${fmtMan(d.endReal)}`
       : `최종 진단: 지금 계획이면 ${d.res.deplete}세에 바닥 · 부족한 돈 ${fmtMan(d.shortReal)}`);
     L.push(`은퇴 때 필요한 돈 ${fmtMan(d.res.PVneed / d.defl)} · 예상 자산 ${fmtMan(d.res.Aret / d.defl)} (지금 돈 가치, 수익률 은퇴 전 ${m.rrPre}%·은퇴 후 ${m.rr}%·물가 ${m.inf}%)`);
   }
