@@ -232,6 +232,8 @@
   .verdict.info { background: var(--bg-alt); color: var(--dark-warm); border-left: 4px solid var(--brown); font-weight: 600; }
   .verdict.info .vi { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-right: 7px; border-radius: 50%; background: var(--brown); color: var(--white); font-size: 13px; font-weight: 900; font-style: italic; font-family: Georgia, serif; vertical-align: -3px; }
   .verdict b { font-weight: 900; }
+  .verdict .alt-list { margin: 8px 0 8px 20px; padding: 0; }
+  .verdict .alt-list li { margin: 3px 0; }
 
   .wi { margin-top: 26px; padding: 20px 20px 18px; border: 1.5px dashed var(--beige-gold); border-radius: 16px; background: var(--white); }
   .wi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -400,6 +402,7 @@
   .sum-card .s { font-size: 13px; color: var(--ink-soft); font-weight: 600; margin-top: 4px; }
   .sum-card .flag { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
   .flag.ok { background: #E3EDE2; color: #2F5D3B; } .flag.warn { background: #F6E9CF; color: #7A5410; } .flag.bad { background: #F4DCD3; color: #8A2E1C; }
+  .flag.info { background: var(--bg-alt); color: var(--dark-warm); }
 
 
   .insight-box { background: var(--dark-warm); color: var(--white); border-radius: 20px; padding: 28px; margin-top: 8px; }
@@ -1545,8 +1548,11 @@ function model() {
         m.overE = rowE ? Math.max(0, rowE.w - rowE.limit) / W : 0;
         m.wcIn = e.p3; m.wcOut = Math.max(0, e.from3 - e.p3);
         m.cOk = m.wcIn <= SEP_MAN;
-        /* 한도 초과 안내용 (위 결과 숫자는 그대로) — 넘친 몫이 세금을 얼마나 늘렸는지, 그 몫을 다른 계좌 남은 한도까지 옮겨 꺼내면 세금이 얼마인지.
-           대안도 같은 엔진을 계좌별로 한 번 더 불러 구함. 인출 순서(① → ② → ③)와 위 세금은 바꾸지 않음 */
+        /* 한도 초과 안내용 (위 결과 숫자는 그대로) — 넘친 몫이 세금을 얼마나 늘렸는지, 그 몫을 다른 계좌로 옮겨 꺼내면 세금이 얼마인지.
+           대안도 같은 엔진을 계좌별로 한 번 더 불러 구함. 인출 순서(① → ② → ③)와 위 세금은 바꾸지 않음.
+           후보(첫해 인출 합계는 모두 같음): a 지금처럼 · c 넘친 몫을 다른 계좌의 남은 한도(또는 잔액)까지 전부 옮김(= note.alt)
+           · b 0 ~ c 사이를 훑어 찾은 첫해 세금 최저 배분 (a·c와 겹치면 넣지 않음). 가장 세금이 적은 후보 = note.best
+           훑는 방법: c를 n등분(n = 20, 50만원 간격이 더 촘촘하면 그 간격, 최대 40) → 가장 낮은 점 양옆 구간을 각각 10등분. 중간 점은 만원 단위로 반올림 */
         const note = { over2: g(rowR, 'over2'), over3: g(rowE, 'over3'), extra2: 0, tax3: g(rowE, 'taxOther'), alt: null };
         note.over1 = Math.max(0, m.overE - note.over3);   // 세액공제 받지 않은 원금(①)이 넘친 몫 — 세금 없음
         if (rowR && rowR.over2 > 0) note.extra2 = rowR.over2 * (retTaxNat / (B * W)) * (1 + TR.INCOME_TAX.local) * (1 - RC_CALC.pension.retireRatio(rowR.nRet)) / W;   // 감면을 못 받은 만큼
@@ -1554,14 +1560,38 @@ function model() {
         let shift = 0, to = '', byBal = false;   // byBal: 옮길 몫이 남은 한도가 아니라 그 계좌 잔액에서 막힘
         if (m.overR > 0.5 && rowE && !m.preElig) { shift = Math.min(m.overR, m.limitE - takeE, A + C - takeE); to = 'E'; byBal = A + C - takeE < m.limitE - takeE; }
         else if (m.overE > 0.5 && rowR) { shift = Math.min(m.overE, m.limitR - takeR, B - takeR); to = 'R'; byBal = B - takeR < m.limitR - takeR; }
-        if (shift > 0.5) {
-          const nR = to === 'E' ? takeR - shift : takeR + shift, nE = to === 'E' ? takeE + shift : takeE - shift;
+        const altOf = s => {   // s만큼 다른 계좌(to)로 옮겨 꺼낸 경우
+          const nR = to === 'E' ? takeR - s : takeR + s, nE = to === 'E' ? takeE + s : takeE - s;
           const aR = B > 0 ? run(0, B, 0, nR, m.eligR, false) : null;
           const aE = A + C > 0 ? (m.preElig ? outRow(nE) : run(A, 0, C, nE, m.eligAge, m.pre2013)) : null;
           const sumA = k => g(aR, k) + g(aE, k);
-          note.alt = { to, shift, byBal, takeR: nR, takeE: nE, tax: sumA('tax'), taxRetire: sumA('taxRetire'), taxPension: sumA('taxPension'), taxOther: sumA('taxOther'),
+          return { to, shift: s, byBal, takeR: nR, takeE: nE, tax: sumA('tax'), taxRetire: sumA('taxRetire'), taxPension: sumA('taxPension'), taxOther: sumA('taxOther'),
             p3: g(aE, 'p3'), method: aE ? aE.method : '-', over: Math.max(0, g(aR, 'w') - g(aR, 'limit')) + Math.max(0, g(aE, 'w') - g(aE, 'limit')) };
+        };
+        note.cands = [{ key: 'a', to, shift: 0, byBal: false, takeR, takeE, tax: e.tax, taxRetire: e.taxRetire, taxPension: e.taxPension, taxOther: e.taxOther,
+          p3: e.p3, method: e.method, over: m.overR + m.overE }];
+        if (shift > 0.5) {
+          note.alt = altOf(shift);
+          const seen = new Map([[0, note.cands[0]], [shift, note.alt]]);   // 옮긴 몫 → 결과 (같은 점은 한 번만 계산)
+          const at = v => { const s = v <= 0 ? 0 : v >= shift ? shift : Math.round(v); if (!seen.has(s)) seen.set(s, altOf(s)); return s; };
+          const n = Math.min(40, Math.max(20, Math.ceil(shift / 50)));
+          const grid = []; for (let i = 0; i <= n; i++) grid.push(at(shift * i / n));
+          const low = (pts) => pts.reduce((x, y) => seen.get(y).tax < seen.get(x).tax - 1e-9 || (Math.abs(seen.get(y).tax - seen.get(x).tax) <= 1e-9 && y < x) ? y : x);
+          const k = grid.indexOf(low(grid)), sk = grid[k];
+          const lo = grid[Math.max(0, k - 1)], hi = grid[Math.min(n, k + 1)];
+          for (let j = 1; j < 10; j++) { at(lo + (sk - lo) * j / 10); at(sk + (hi - sk) * j / 10); }
+          /* 화면에 따로 보이지 않는 탐색 점: 연금저축·IRP 인출이 ① 전부 + ③ 연 1,500만원(PENSION.separateLimit, 한도 안)이 되는 지점 —
+             저율 분리과세 경계라 세금이 뛰는 곳이어서 격자가 비켜 가지 않게 한 번 더 계산. ③이 1,500을 넘지 않는 쪽으로 만원 단위 맞춤 */
+          const n15 = A + SEP_MAN, s15 = to === 'E' ? Math.floor(n15 - takeE + 1e-9) : Math.ceil(takeE - n15 - 1e-9);
+          if (n15 <= Math.min(A + C, m.limitE) && s15 > 0 && s15 < shift) at(s15);
+          const sb = low([...seen.keys()].sort((x, y) => x - y));
+          note.scan = seen.size - 1;   // 엔진으로 따로 계산한 배분 수 (지금처럼 제외)
+          note.nextTax = Math.min(...[...seen.entries()].filter(([s]) => s > 0).map(([, r]) => r.tax));   // 옮겨 꺼내는 배분 중 가장 싼 세금
+          if (sb > 0 && sb < shift) note.cands.push({ key: 'b', ...seen.get(sb) });
+          note.cands.push({ key: 'c', ...note.alt });
         }
+        note.best = note.cands.reduce((x, y) => y.tax < x.tax - 1e-9 ? y : x);   // 세금이 같으면 앞 후보(지금처럼 쪽)
+        note.save = Math.max(0, e.tax - note.best.tax);                         // 꺼내는 계좌를 바꾸면 줄어드는 첫해 세금
         m.limitNote = note;
       }
     } catch (err) { m.engine = null; }
@@ -1830,6 +1860,8 @@ function limParts(m) {
   if (m.hasE) p.push({ nm: '연금저축·IRP', v: m.limitE, y: m.yearE, over: m.overE, take: m.wa + m.wc, pre: m.preElig });
   return p;
 }
+/* 한도 초과 몫을 다른 계좌로 옮겨 꺼내면 줄어드는 첫해 세금 (가장 싼 후보 기준, 0.5만원 이하·55세 전·엔진 없음은 0) — 점검표·새는 돈·복사 글 공통 */
+const limitSave = m => m.limitOver > 0 && m.wAge >= MIN_AGE && m.limitNote && m.limitNote.save > 0.5 ? m.limitNote.save : 0;
 function limText(m) { const p = limParts(m); return p.length > 1 ? p.map(x => `${x.nm} ${limFmt(x.v)}`).join(' · ') : limFmt(m.limit); }
 /* 4단계 한도 초과 안내 — 넘친 몫은 이미 '연금외수령'으로 세금 계산에 들어가 있으므로 경고가 아니라 안내.
    그 몫을 다른 계좌의 남은 한도까지 옮겨 꺼낸 경우의 세금(m.limitNote.alt, 같은 엔진으로 계산)을 함께 보여 줌 */
@@ -1848,14 +1880,23 @@ function limitNoteHtml(m, parts) {
   if (!said.length) return '';
   let alt = '';
   if (n && n.alt && e) {
-    const a = n.alt, d = a.tax - e.tax, dst = a.to === 'E' ? '연금저축·IRP' : '퇴직금 IRP';
+    /* 후보(지금처럼 · 훑어 찾은 가장 세금이 적은 배분 · 넘친 몫 전부 옮김)의 첫해 세금을 나란히 적고, 가장 적은 것을 안내 */
+    const a = n.alt, dst = a.to === 'E' ? '연금저축·IRP' : '퇴직금 IRP', best = n.best;
     const all = a.shift >= (a.to === 'E' ? m.overR : m.overE) - 0.5;
-    alt = ` ${all ? `넘친 ${fmtMan(a.shift)}을` : `넘친 몫 중 ${fmtMan(a.shift)}(${dst}에 남은 ${a.byBal ? '잔액' : '한도'})을`} ${dst}에서 대신 꺼내면 첫해 세금이 ${fmtMan(e.tax)}에서 <b>${fmtMan(a.tax)}</b>으로 바뀌어요`;
-    if (d > 0.5) alt += `(${fmtMan(d)} 더 많음). ${a.to === 'E'
-      ? `세액공제 받은 원금·수익 ${fmtMan(a.p3)}에 연금소득세 ${fmtMan(a.taxPension)}이 붙기 때문이에요(${a.method})${a.p3 > SEP_MAN ? ` — 연 ${T_SEP}만원을 넘어 전액이 종합과세 또는 ${T_SEPR} 분리과세 대상이 됩니다` : ''}. 지금처럼 꺼내는 편이 세금이 적어요.`
-      : `퇴직소득세가 ${fmtMan(a.taxRetire - e.taxRetire)} 늘기 때문이에요. 지금처럼 꺼내는 편이 세금이 적어요.`}`;
-    else if (d < -0.5) alt += `(${fmtMan(-d)} 적음). 계좌마다 꺼낼 금액을 정할 수 있다면 이렇게 나눠 꺼내는 편이 유리해요.`;
-    else alt += '(거의 같음).';
+    const split = c => [c.takeR > 0.5 ? `퇴직금 IRP ${fmtMan(c.takeR)}` : '', c.takeE > 0.5 ? `연금저축·IRP ${fmtMan(c.takeE)}` : ''].filter(Boolean).join(' + ') || '0원';
+    const name = c => c.key === 'a' ? '지금처럼 꺼내기' : c.key === 'b' ? `${fmtMan(c.shift)}만 옮기기`
+      : all ? `넘친 ${fmtMan(c.shift)} 모두 ${dst}로 옮기기` : `${dst}에 남은 ${c.byBal ? '잔액' : '한도'} ${fmtMan(c.shift)}까지 옮기기`;
+    const line = c => (c.key === 'a' ? '지금처럼' : c.key === 'b' ? `가장 세금이 적은 배분(${fmtMan(c.shift)} 옮김)`
+      : all ? `넘친 ${fmtMan(c.shift)} 모두 옮김` : `남은 ${c.byBal ? '잔액' : '한도'} ${fmtMan(c.shift)}까지 옮김`) + (c.key !== 'b' && c === best ? ' = 가장 세금이 적은 배분' : '');
+    alt = ` 넘친 몫을 ${dst}에서 대신 꺼내는 배분별 세금이에요(첫해 세금 기준).<ul class="alt-list">${n.cands.map(c => `<li>${line(c)} (${split(c)}): <b>${fmtMan(c.tax)}</b></li>`).join('')}</ul>`;
+    if (best.key === 'a') {
+      const more = a.tax - e.tax;   // 넘친 몫을 전부 옮기면 늘어나는 세금
+      alt += `가장 세금이 적은 배분: <b>지금처럼 꺼내기</b> — ${fmtMan(e.tax)}${more > 0.5 ? `(넘친 몫을 전부 옮기면 ${fmtMan(more)} 더 많음)` : '(전부 옮겨도 거의 같음)'}.`;
+    } else {
+      alt += `가장 세금이 적은 배분: <b>${name(best)}</b>(${split(best)}) — <b>${fmtMan(best.tax)}</b>${n.save > 0.5 ? `(지금보다 ${fmtMan(n.save)} 적음)` : '(지금과 거의 같음)'}. 계좌마다 꺼낼 금액을 정할 수 있다면 이렇게 나눠 꺼내는 편이 유리해요.`;
+    }
+    if (a.to === 'E' && a.p3 > SEP_MAN) alt += ` 연금저축·IRP에서 세액공제 받은 원금·수익을 1년에 ${T_SEP}만원 넘게 꺼내면 전액이 종합과세 또는 ${T_SEPR} 분리과세 대상이 돼요.`;
+    else if (a.to === 'R' && a.taxRetire - e.taxRetire > 0.5) alt += ` 퇴직금 IRP로 옮긴 몫에는 퇴직소득세가 붙어요(넘친 몫 전부 옮기면 +${fmtMan(a.taxRetire - e.taxRetire)}).`;
   } else if (two) {
     const left = x => x.nm === '퇴직금 IRP' ? m.retire - m.wb : m.ps + m.irp - m.wa - m.wc;   // 그 계좌에 남은 잔액
     const room = parts.filter(x => x.over <= 0 && x.v - x.take > 0.5 && left(x) > 0.5);
@@ -2103,7 +2144,11 @@ function renderDiag(m) {
   }
   const leaks = [];
   if (m.engine && !m.cOk) leaks.push(`연금 세액공제 받은 원금·수익을 1년에 <b>${fmtMan(m.wcIn)}</b> 꺼내 연 ${T_SEP}만원 선을 넘습니다. 계좌를 나누면 세금이 줄어듭니다 (4단계).`);
-  if (m.limitOver > 0) leaks.push(`첫해 인출이 연금수령한도를 넘어 <b>${fmtMan(m.limitOver)}</b>은 높은 세율로 과세됩니다 (4단계).`);
+  /* 4단계: 55세 전·연금저축·IRP 요건 전 인출(점검표 빨강 사유)은 그대로 '새는 돈'. 한도 초과는 꺼내는 계좌를 바꿔 세금이 줄 때만, 그 절약액으로 (지금이 가장 싸면 넣지 않음) */
+  if (m.wAge < MIN_AGE && m.wb + m.wc > 0) leaks.push(`${MIN_AGE}세 전에 꺼내는 퇴직금·세액공제 받은 원금·수익 <b>${fmtMan(m.wb + m.wc)}</b>은 연금외수령이라 높은 세율로 과세됩니다 (4단계).`);
+  if (m.wAge >= MIN_AGE && m.preElig && m.wc > 0) leaks.push(`연금저축·IRP 가입 ${JOIN_YEARS}년 전에 꺼내는 세액공제 받은 원금·수익 <b>${fmtMan(m.wc)}</b>은 기타소득세 ${T_OTHR}로 과세됩니다 (4단계).`);
+  const lSave = limitSave(m);
+  if (lSave > 0) leaks.push(`첫해 인출이 연금수령한도를 ${fmtMan(m.limitOver)} 넘습니다. 꺼내는 계좌를 바꾸면 첫해 세금 <b>${fmtMan(lSave)}</b> 절약 (4단계).`);
   if (m.isaMove > 0) leaks.push(`ISA 만기 자금을 연금으로 옮기면 환급 <b>약 ${fmtMan(m.isaRefund)}</b> — 놓치면 그대로 사라집니다 (5단계).`);
   if (m.fin > NH_FIN_MAN) leaks.push(`일반계좌 금융소득 <b>${fmtMan(m.fin)}</b>이 ${comma(NH_FIN_MAN)}만원을 넘어 건보료 판정 소득에 전액 잡힙니다 (5·6단계).`);
   if (m.hi !== 'ok') leaks.push(`건보료 피부양자에서 ${m.hi === 'bad' ? '빠질 수 있습니다' : '빠지기 직전입니다'}. 지역가입자가 되면 보험료가 따로 나갑니다 (6단계).`);
@@ -2124,12 +2169,16 @@ function renderSummary(m) {
   const flag = (k, t) => `<span class="flag ${k}">${t}</span>`;
   const short = Math.max(0, m.gapNeed - m.bridge);
   const lim = limText(m);
-  const c4 = (m.limitOver > 0 || m.wAge < MIN_AGE) ? 'bad' : (m.cOk ? 'ok' : 'warn');
+  /* 4번 카드: 55세 전 인출·연금저축·IRP 요건 전 인출은 빨강. 한도 초과는 꺼내는 계좌를 바꿔 세금이 줄면 노랑(절약액 안내),
+     지금이 가장 싸면(또는 엔진 없이 비교 못 하면) 안내 톤 — 1,500만원 초과 노랑이 있으면 그쪽을 보임 */
+  const lSave = limitSave(m);
+  const c4 = (m.wAge < MIN_AGE || (m.preElig && m.wa + m.wc > 0)) ? 'bad' : lSave > 0 ? 'save' : !m.cOk ? 'warn' : m.limitOver > 0 ? 'info' : 'ok';
   const cards = [
     ['노후 자산', `${fmtMan(m.total)}`, `연금계좌 ${pct(m.total ? m.pensionTotal / m.total * 100 : 0)} · ISA·일반 ${fmtMan(m.bridge)}`, ''],
     ['소득 공백', `${m.gap}년 · ${fmtMan(m.gapNeed)}`, short > 0 ? `ISA·일반으로 ${fmtMan(short)} 부족` : 'ISA·일반으로 충당 가능', m.gap === 0 || short === 0 ? flag('ok', '충분') : flag('warn', '⚠️ 부족')],
     ['국민연금', m.nps ? `${m.birth + m.npsStart}년(${m.npsStart}세)부터 월 ${fmtMan(m.npsSel)}` : `${m.birth + m.npsStart}년(${m.npsStart}세)부터 · 예상액 미입력`, m.shift === 0 ? '정상 수령' : m.shift < 0 ? `${-m.shift}년 당겨 받기` : `${m.shift}년 미뤄 받기`, ''],
-    ['연금 첫해 인출', `${fmtMan(m.wAmt)} / 한도 ${lim}`, (m.engine ? `첫해 세금 약 ${fmtMan(m.engine.tax)} · ` : '') + `${T_SEP}만원 판정 대상 ${fmtMan(m.wcIn)}`, c4 === 'ok' ? flag('ok', '저율 과세') : c4 === 'warn' ? flag('warn', `⚠️ ${T_SEP}만원 초과`) : flag('bad', '⚠️ 한도·나이 확인')],
+    ['연금 첫해 인출', `${fmtMan(m.wAmt)} / 한도 ${lim}`, (m.engine ? `첫해 세금 약 ${fmtMan(m.engine.tax)} · ` : '') + `${T_SEP}만원 판정 대상 ${fmtMan(m.wcIn)}` + (c4 === 'save' ? ` · 꺼내는 계좌를 바꾸면 ${fmtMan(lSave)} 절약` : ''),
+      c4 === 'ok' ? flag('ok', '저율 과세') : c4 === 'info' ? flag('info', '한도 초과분 세금 반영') : c4 === 'save' ? flag('warn', '⚠️ 계좌 바꾸면 절약') : c4 === 'warn' ? flag('warn', `⚠️ ${T_SEP}만원 초과`) : flag('bad', '⚠️ 한도·나이 확인')],
     ['ISA 만기 연금 이전', `환급 약 ${fmtMan(m.isaRefund)}`, m.isaDate ? `${addDays(m.isaDate, 60)}까지 이전` : '만기일 미입력', m.isaMove > 0 ? flag('ok', '챙길 것') : ''],
     ['건보료 피부양자', m.hi === 'ok' ? '유지' : m.hi === 'warn' ? '경계' : '제외 가능', `본인 판정 소득 ${fmtMan(m.myInc)}`, m.hi === 'ok' ? flag('ok', '안전') : m.hi === 'warn' ? flag('warn', '⚠️ 경계') : flag('bad', '⚠️ 제외')]
   ];
@@ -2288,7 +2337,7 @@ function resultText() {
   const short = Math.max(0, m.gapNeed - m.bridge);
   L.push(`노후 자산 ${fmtMan(m.total)} (연금계좌 ${pct(m.total ? m.pensionTotal / m.total * 100 : 0)}) · 소득 공백 ${m.gap}년${m.gap === 0 ? '' : short > 0 ? `, ISA·일반으로 ${fmtMan(short)} 부족` : ', ISA·일반으로 충당 가능'}`);
   const lim = limText(m);
-  L.push(`국민연금 ${m.npsStart}세부터 ${m.nps ? '월 ' + fmtMan(m.npsSel) : '(예상액 미입력)'} · 연금 첫해 인출 ${fmtMan(m.wAmt)} (한도 ${lim}${m.engine ? `, 세금 약 ${fmtMan(m.engine.tax)}` : ''}${m.cOk ? '' : `, ${T_SEP}만원 초과`})`);
+  L.push(`국민연금 ${m.npsStart}세부터 ${m.nps ? '월 ' + fmtMan(m.npsSel) : '(예상액 미입력)'} · 연금 첫해 인출 ${fmtMan(m.wAmt)} (한도 ${lim}${m.engine ? `, 세금 약 ${fmtMan(m.engine.tax)}` : ''}${m.cOk ? '' : `, ${T_SEP}만원 초과`}${limitSave(m) > 0 ? `, 꺼내는 계좌를 바꾸면 ${fmtMan(limitSave(m))} 절약` : ''})`);
   L.push(`ISA→연금 이전 환급 약 ${fmtMan(m.isaRefund)} · 건보료 피부양자 ${m.hi === 'ok' ? '유지' : m.hi === 'warn' ? '경계' : '제외 가능'} (본인 판정 소득 ${fmtMan(m.myInc)})`);
   L.push(location.href.split(/[?#]/)[0]);
   return L.join('\n');
