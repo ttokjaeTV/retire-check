@@ -229,6 +229,8 @@
   .verdict.ok { background: #E3EDE2; color: #2F5D3B; }
   .verdict.warn { background: #F6E9CF; color: #7A5410; }
   .verdict.bad { background: #F4DCD3; color: #8A2E1C; }
+  .verdict.info { background: var(--bg-alt); color: var(--dark-warm); border-left: 4px solid var(--brown); font-weight: 600; }
+  .verdict.info .vi { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-right: 7px; border-radius: 50%; background: var(--brown); color: var(--white); font-size: 13px; font-weight: 900; font-style: italic; font-family: Georgia, serif; vertical-align: -3px; }
   .verdict b { font-weight: 900; }
 
   .wi { margin-top: 26px; padding: 20px 20px 18px; border: 1.5px dashed var(--beige-gold); border-radius: 16px; background: var(--white); }
@@ -909,9 +911,9 @@
         <div class="field"><label class="label" for="isaMove">연금계좌로 옮길 금액</label><div class="input-wrap"><input type="text" inputmode="numeric" id="isaMove" data-money><span class="unit">만원</span></div><div class="chip-read" data-for="isaMove"></div><div class="input-hint"><span data-rule="PENSION_SAVINGS.isaTransferCreditCap/PENSION_SAVINGS.isaTransferCreditRate/1e4">3,000</span>만원을 옮기면 공제 한도 <span data-rule="PENSION_SAVINGS.isaTransferCreditCap/1e4">300</span>만원을 다 씁니다.</div></div>
       </div>
       <div style="margin-top:14px">
-        <span class="label">올해 총급여 <span data-rule="PENSION_SAVINGS.creditRateWageLimit/1e4">5,500</span>만원(종합소득금액 <span data-rule="PENSION_SAVINGS.creditRateComprehensiveLimit/1e4">4,500</span>만원)</span>
-        <div class="seg" id="rateSeg"><button type="button" data-rate="16.5" data-rule="PENSION_SAVINGS.creditRateHigh*100" data-rule-attr="data-rate">이하 (<span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>%)</button><button type="button" data-rate="13.2" data-rule="PENSION_SAVINGS.creditRateLow*100" data-rule-attr="data-rate" class="on">초과 (<span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%)</button></div>
-        <div class="input-hint">고르지 않으면 낮은 쪽 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%로 계산합니다.</div>
+        <span class="label">세액공제율</span>
+        <div class="seg" id="rateSeg"><button type="button" data-rate="16.5" data-rule="PENSION_SAVINGS.creditRateHigh*100" data-rule-attr="data-rate"><span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>%</button><button type="button" data-rate="13.2" data-rule="PENSION_SAVINGS.creditRateLow*100" data-rule-attr="data-rate" class="on"><span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%</button></div>
+        <div class="input-hint">옮기는 해 총급여 <span data-rule="PENSION_SAVINGS.creditRateWageLimit/1e4">5,500</span>만원(종합소득 <span data-rule="PENSION_SAVINGS.creditRateComprehensiveLimit/1e4">4,500</span>만원) 이하면 <span data-rule="PENSION_SAVINGS.creditRateHigh*100">16.5</span>%, 넘으면 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%예요. 고르지 않으면 낮은 쪽 <span data-rule="PENSION_SAVINGS.creditRateLow*100">13.2</span>%로 계산합니다.</div>
       </div>
       <div class="field" style="margin-top:18px"><label class="label" for="fin">일반계좌 연간 배당·이자 (ISA·연금계좌 제외)</label><div class="input-wrap"><input type="text" inputmode="numeric" id="fin" data-money placeholder="0"><span class="unit">만원</span></div><div class="chip-read" data-for="fin"></div></div>
       <div class="result" id="r5"></div>
@@ -1507,6 +1509,7 @@ function model() {
   m.other = num('other');   // 6단계 근로·기타소득 (만원/년) → 다른 종합소득으로 세금 계산에 포함
   m.retYears = has('retYears') ? clamp(num('retYears'), 1, 50) : 20;
   m.engine = null;
+  m.limitNote = null;   // 한도 초과 안내 (엔진 계산이 있을 때만)
   m.engineMissing = typeof simulate !== 'function';   // 퇴직소득세는 calc-v1(RC_CALC)로 직접 계산
   if (!m.engineMissing && m.wAge >= MIN_AGE && m.pensionTotal > 0 && m.wAmt > 0) {
     try {
@@ -1521,7 +1524,7 @@ function model() {
       const rowR = B > 0 ? run(0, B, 0, m.wb, m.eligR, false) : null;
       const outRow = amt => {   // 요건 전 연금저축·IRP: ①은 세금 없음, ③은 기타소득세 (엔진은 요건 전 인출을 따로 다루지 않음)
         const t1 = Math.min(A, amt), t3 = Math.min(C, amt - t1), tOth = t3 * W * PEN.otherIncomeRate;
-        return { from1: t1 * W, from2: 0, from3: t3 * W, p3: 0, taxRetire: 0, taxPension: 0, taxOther: tOth, tax: tOth, net: (t1 + t3) * W - tOth, method: '-', limit: 0, limitYear: m.yearE, w: (t1 + t3) * W };
+        return { from1: t1 * W, from2: 0, from3: t3 * W, p3: 0, taxRetire: 0, taxPension: 0, taxOther: tOth, tax: tOth, net: (t1 + t3) * W - tOth, method: '-', limit: 0, limitYear: m.yearE, w: (t1 + t3) * W, over2: 0, over3: t3 * W };
       };
       const rowE = A + C > 0 ? (m.preElig ? outRow(m.wa + m.wc) : run(A, 0, C, m.wa + m.wc, m.eligAge, m.pre2013)) : null;
       if (rowR || rowE) {
@@ -1542,6 +1545,24 @@ function model() {
         m.overE = rowE ? Math.max(0, rowE.w - rowE.limit) / W : 0;
         m.wcIn = e.p3; m.wcOut = Math.max(0, e.from3 - e.p3);
         m.cOk = m.wcIn <= SEP_MAN;
+        /* 한도 초과 안내용 (위 결과 숫자는 그대로) — 넘친 몫이 세금을 얼마나 늘렸는지, 그 몫을 다른 계좌 남은 한도까지 옮겨 꺼내면 세금이 얼마인지.
+           대안도 같은 엔진을 계좌별로 한 번 더 불러 구함. 인출 순서(① → ② → ③)와 위 세금은 바꾸지 않음 */
+        const note = { over2: g(rowR, 'over2'), over3: g(rowE, 'over3'), extra2: 0, tax3: g(rowE, 'taxOther'), alt: null };
+        note.over1 = Math.max(0, m.overE - note.over3);   // 세액공제 받지 않은 원금(①)이 넘친 몫 — 세금 없음
+        if (rowR && rowR.over2 > 0) note.extra2 = rowR.over2 * (retTaxNat / (B * W)) * (1 + TR.INCOME_TAX.local) * (1 - RC_CALC.pension.retireRatio(rowR.nRet)) / W;   // 감면을 못 받은 만큼
+        const takeR = e.from2, takeE = e.from1 + e.from3;
+        let shift = 0, to = '', byBal = false;   // byBal: 옮길 몫이 남은 한도가 아니라 그 계좌 잔액에서 막힘
+        if (m.overR > 0.5 && rowE && !m.preElig) { shift = Math.min(m.overR, m.limitE - takeE, A + C - takeE); to = 'E'; byBal = A + C - takeE < m.limitE - takeE; }
+        else if (m.overE > 0.5 && rowR) { shift = Math.min(m.overE, m.limitR - takeR, B - takeR); to = 'R'; byBal = B - takeR < m.limitR - takeR; }
+        if (shift > 0.5) {
+          const nR = to === 'E' ? takeR - shift : takeR + shift, nE = to === 'E' ? takeE + shift : takeE - shift;
+          const aR = B > 0 ? run(0, B, 0, nR, m.eligR, false) : null;
+          const aE = A + C > 0 ? (m.preElig ? outRow(nE) : run(A, 0, C, nE, m.eligAge, m.pre2013)) : null;
+          const sumA = k => g(aR, k) + g(aE, k);
+          note.alt = { to, shift, byBal, takeR: nR, takeE: nE, tax: sumA('tax'), taxRetire: sumA('taxRetire'), taxPension: sumA('taxPension'), taxOther: sumA('taxOther'),
+            p3: g(aE, 'p3'), method: aE ? aE.method : '-', over: Math.max(0, g(aR, 'w') - g(aR, 'limit')) + Math.max(0, g(aE, 'w') - g(aE, 'limit')) };
+        }
+        m.limitNote = note;
       }
     } catch (err) { m.engine = null; }
   }
@@ -1810,6 +1831,38 @@ function limParts(m) {
   return p;
 }
 function limText(m) { const p = limParts(m); return p.length > 1 ? p.map(x => `${x.nm} ${limFmt(x.v)}`).join(' · ') : limFmt(m.limit); }
+/* 4단계 한도 초과 안내 — 넘친 몫은 이미 '연금외수령'으로 세금 계산에 들어가 있으므로 경고가 아니라 안내.
+   그 몫을 다른 계좌의 남은 한도까지 옮겨 꺼낸 경우의 세금(m.limitNote.alt, 같은 엔진으로 계산)을 함께 보여 줌 */
+function limitNoteHtml(m, parts) {
+  const n = m.limitNote, e = m.engine, two = parts.length > 1;
+  const pR = parts.find(x => x.nm === '퇴직금 IRP'), pE = parts.find(x => x.nm === '연금저축·IRP');
+  const said = [];
+  if (m.overR > 0.5) said.push(`${two ? '퇴직금 IRP 한도' : '연금수령한도'} ${limFmt(pR ? pR.v : m.limit)}을 ${fmtMan(m.overR)} 넘겨, 그만큼은 <b>퇴직소득세 감면 없이</b> 과세했어요${n ? `(세금 +${fmtMan(n.extra2)})` : ''}`);
+  if (m.overE > 0.5) {
+    const o3 = n ? n.over3 : m.wcOut, o1 = n ? n.over1 : Math.max(0, m.overE - m.wcOut), sub = [];
+    if (o3 > 0.5) sub.push(`세액공제 받은 원금·수익 ${fmtMan(o3)}은 <b>기타소득세 ${T_OTHR}</b>로 과세했어요${n ? `(이 몫 세금 ${fmtMan(n.tax3)})` : ''}`);
+    if (o1 > 0.5) sub.push(`세액공제 받지 않은 원금 ${fmtMan(o1)}은 원래 세금이 없어 세금이 늘지 않았어요`);
+    const head = m.preElig ? `연금저축·IRP는 아직 연금 요건 전이라 꺼내는 ${fmtMan(m.overE)}이 모두 한도 밖이고` : `${two ? '연금저축·IRP 한도' : '연금수령한도'} ${limFmt(pE ? pE.v : m.limit)}을 ${fmtMan(m.overE)} 넘겨`;
+    if (sub.length) said.push(`${head}, ${sub.join(', ')}`);
+  }
+  if (!said.length) return '';
+  let alt = '';
+  if (n && n.alt && e) {
+    const a = n.alt, d = a.tax - e.tax, dst = a.to === 'E' ? '연금저축·IRP' : '퇴직금 IRP';
+    const all = a.shift >= (a.to === 'E' ? m.overR : m.overE) - 0.5;
+    alt = ` ${all ? `넘친 ${fmtMan(a.shift)}을` : `넘친 몫 중 ${fmtMan(a.shift)}(${dst}에 남은 ${a.byBal ? '잔액' : '한도'})을`} ${dst}에서 대신 꺼내면 첫해 세금이 ${fmtMan(e.tax)}에서 <b>${fmtMan(a.tax)}</b>으로 바뀌어요`;
+    if (d > 0.5) alt += `(${fmtMan(d)} 더 많음). ${a.to === 'E'
+      ? `세액공제 받은 원금·수익 ${fmtMan(a.p3)}에 연금소득세 ${fmtMan(a.taxPension)}이 붙기 때문이에요(${a.method})${a.p3 > SEP_MAN ? ` — 연 ${T_SEP}만원을 넘어 전액이 종합과세 또는 ${T_SEPR} 분리과세 대상이 됩니다` : ''}. 지금처럼 꺼내는 편이 세금이 적어요.`
+      : `퇴직소득세가 ${fmtMan(a.taxRetire - e.taxRetire)} 늘기 때문이에요. 지금처럼 꺼내는 편이 세금이 적어요.`}`;
+    else if (d < -0.5) alt += `(${fmtMan(-d)} 적음). 계좌마다 꺼낼 금액을 정할 수 있다면 이렇게 나눠 꺼내는 편이 유리해요.`;
+    else alt += '(거의 같음).';
+  } else if (two) {
+    const left = x => x.nm === '퇴직금 IRP' ? m.retire - m.wb : m.ps + m.irp - m.wa - m.wc;   // 그 계좌에 남은 잔액
+    const room = parts.filter(x => x.over <= 0 && x.v - x.take > 0.5 && left(x) > 0.5);
+    alt = room.length ? room.map(x => ` ${x.nm}는 한도가 ${isFinite(x.v) ? `${fmtMan(x.v - x.take)} 남아 있어요` : '없어요'}.`).join('') : ' 다른 계좌에는 옮겨 꺼낼 남은 한도나 잔액이 없어요.';
+  }
+  return `<div class="verdict info"><span class="vi" aria-hidden="true">i</span>첫해 인출 중 연금수령한도를 넘는 몫은 '연금외수령'으로 세금 계산에 이미 넣었어요. ${said.join('. ')}.${alt}</div>`;
+}
 function render4(m) {
   $('wAmt').placeholder = comma(m.wDefault); $('wAge').placeholder = Math.max(MIN_AGE, m.retireAge);
   $('wAmtHint').textContent = `비워두면 ${m.wAge < m.npsStart ? '공백기 생활비 전액' : '생활비에서 국민연금을 뺀 금액'} ${fmtMan(m.wDefault)}으로 계산합니다.`;
@@ -1820,9 +1873,7 @@ function render4(m) {
   if (m.wAge < MIN_AGE) verdicts += `<div class="verdict bad">${MIN_AGE}세 전에 꺼내면 '연금수령'이 아니어서 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}, 퇴직금은 감면 없이 과세됩니다.</div>`;
   const parts = limParts(m);
   if (m.preElig && m.wa + m.wc > 0) verdicts += `<div class="verdict bad">연금저축·IRP는 가입 ${JOIN_YEARS}년을 채운 ${m.eligAge}세 해(${m.birth + m.eligAge}년)부터 연금으로 받을 수 있습니다. ${m.wAge}세에 이 계좌에서 꺼내는 ${fmtMan(m.wa + m.wc)}은 '연금외수령'이라 세액공제 받은 원금·수익은 기타소득세 ${T_OTHR}입니다.</div>`;
-  if (m.limitOver > 0) verdicts += parts.length > 1
-    ? `<div class="verdict bad">첫해 인출 계획이 연금수령한도를 넘습니다. 한도는 계좌마다 따로라, ${parts.filter(x => x.over > 0).map(x => `${x.nm}에서 꺼내는 ${fmtMan(x.take)}이 이 계좌 한도 <b>${limFmt(x.v)}</b>보다 ${fmtMan(x.over)} 많습니다`).join(', ')}. 넘는 <b>${fmtMan(m.limitOver)}</b>은 '연금외수령'으로 저율 과세와 퇴직소득세 감면을 받지 못합니다.${parts.filter(x => x.over <= 0 && x.v - x.take > 0.5).map(x => ` ${x.nm}는 한도가 ${isFinite(x.v) ? `${fmtMan(x.v - x.take)} 남으니` : '없으니'}, 넘는 몫을 이 계좌에서 꺼낼 때와 세금을 비교해 보세요.`).join('')}</div>`
-    : `<div class="verdict bad">첫해 인출 계획이 연금수령한도 <b>${lim}</b>을 넘습니다. 넘는 <b>${fmtMan(m.limitOver)}</b>은 '연금외수령'으로 저율 과세와 퇴직소득세 감면을 받지 못합니다.</div>`;
+  if (m.limitOver > 0 && m.wAge >= MIN_AGE) verdicts += limitNoteHtml(m, parts);
   if (m.wOver > 0) verdicts += `<div class="verdict warn">연금계좌 잔액보다 <b>${fmtMan(m.wOver)}</b> 많이 꺼내는 계획입니다.</div>`;
   const e = m.engine;
   if (m.wcIn === 0) verdicts += `<div class="verdict ok">첫해에는 세금 없는 원금과 퇴직금만 꺼내서 연 ${T_SEP}만원 판정 대상이 없습니다. 세액공제 받은 원금·수익은 뒤로 미뤄 두고, 꺼낼 때 1년에 ${T_SEP}만원 이하로 나누면 됩니다.</div>`;
