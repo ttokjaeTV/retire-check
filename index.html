@@ -2014,7 +2014,7 @@ function render5(m) {
       ${stat('예상 환급액', fmtMan(m.isaRefund), `${m.creditRate}% 적용`, true)}
       ${stat('연금 이전 마감', dl || '만기일 입력', '만기 후 60일 이내')}
     </div>
-    <p class="note">기존 연금계좌 세액공제 한도(연 ${comma(PSV.creditLimitTotal / 1e4)}만원)와 별도로 붙습니다. 증권사 앱의 'ISA 만기자금 연금 전환' 메뉴를 쓰셔야 하고, 옮긴 해에만 적용됩니다.</p>
+    <p class="note">기존 연금계좌 세액공제 한도(연 ${comma(PSV.creditLimitTotal / 1e4)}만원)와 별도로 붙습니다. 증권사 앱의 'ISA 만기자금 연금 전환' 메뉴를 쓰셔야 하고, 옮긴 해에만 적용됩니다. 세액공제는 그해 낼 소득세 안에서만 돌려받으므로, 은퇴 후 소득이 적어 낼 세금이 거의 없으면 환급이 이보다 적거나 0일 수 있습니다.</p>
     <div style="margin-top:22px"><span class="label">일반계좌 금융소득 ${fmtMan(m.fin)} · 경계선까지 거리</span>${gauge(m.fin, FIN_TAX_MAN, [[NH_FIN_MAN, `${comma(NH_FIN_MAN)}만원 건보료`], [FIN_TAX_MAN, `${comma(FIN_TAX_MAN)}만원 종합과세`]])}</div>
     ${finV}`;
   document.querySelectorAll('#rateSeg button').forEach(b => b.classList.toggle('on', parseFloat(b.dataset.rate) === m.creditRate));
