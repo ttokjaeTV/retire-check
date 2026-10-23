@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="https://ttokjaetv.github.io/member-lock.js"></script>
+<script src="https://ttokjaetv.github.io/profile-v1.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>은퇴 5년 전 점검 가이드 · 똑재TV</title>
 <meta name="description" content="은퇴 5년 전, 소득 공백기·국민연금 수령 시기·연금 인출 순서·연 1,500만원·ISA 만기·건보료 피부양자까지 6단계로 숫자 점검">
@@ -483,6 +484,8 @@
     <a class="cta-link" href="https://www.youtube.com/@ttok_jae" target="_blank" rel="noopener"><span class="yt-mark"></span>똑재TV 구독하기</a>
     <a class="cta-link" href="https://cafe.naver.com/ttokjae" target="_blank" rel="noopener"><span class="n-mark">N</span>평생 ETF 투자 카페</a>
   </div>
+
+  <div id="tj-profile"></div>
 
   <nav class="tabs" id="tabs" role="tablist">
     <button class="tab on" type="button" data-tab="1" role="tab"><span class="tab-n">1</span>자산 지도</button>
@@ -2402,6 +2405,11 @@ PF.bind(renderAll);
 PF.render();
 renderAll();
 PF.load(renderAll);
+/* 내 정보(다른 노후 계산기와 같이 쓰는 값) 채우기·저장 — 허브 profile-v1.js */
+if (window.TJProfile) TJProfile.attach({ map: {
+  'birth': 'birth', 'wiAge': 'age', 'retireAge': 'retireAge', 'endAge': 'endAge', 'living': 'spend', 'inf': 'inflation', 'save': 'saving',
+  'retire': 'sev', 'retYears': 'svcYears', 'ps': 'ps', 'irp': 'irp', 'noded': 'noded', 'isa': 'isa', 'gen': 'gen',
+  'nps': 'nps', 'wAge': 'wAge', 'spNps': 'spNps' }, clicks: '#livingChips .chip' });
 document.addEventListener('toggle', placeUnits, true);   // 접힌 칸(details)을 펼칠 때
 let unitT = null; window.addEventListener('resize', () => { clearTimeout(unitT); unitT = setTimeout(placeUnits, 200); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeUnits);   // 웹폰트가 늦게 뜨면 폭을 다시 잰다
